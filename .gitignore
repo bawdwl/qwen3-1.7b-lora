@@ -1,0 +1,32 @@
+# Local data and model assets
+data/source/
+data/prepared/
+models/
+outputs/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Caches and charts
+.cache/
+.huggingface/
+*.log
+*.tmp
+
+# Secrets
+.env
+.env.*
+secrets.json
+*.pem
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
