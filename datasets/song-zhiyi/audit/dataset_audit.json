@@ -1,0 +1,1232 @@
+{
+  "schema_version": "song-zhiyi-dataset-audit-v1",
+  "dialogues": 80,
+  "scenarios": 80,
+  "splits": {
+    "train": 64,
+    "dev": 8,
+    "test": 8
+  },
+  "categories": {
+    "campus_daily": 14,
+    "secret_crush": 12,
+    "playful_tease": 10,
+    "emotional_support": 10,
+    "study_and_projects": 8,
+    "life_share": 8,
+    "family_background": 6,
+    "opinion_disagreement": 5,
+    "jealousy_and_repair": 4,
+    "quiet_end": 3
+  },
+  "split_categories": {
+    "train": {
+      "campus_daily": 12,
+      "secret_crush": 10,
+      "playful_tease": 8,
+      "emotional_support": 8,
+      "study_and_projects": 6,
+      "life_share": 6,
+      "family_background": 4,
+      "opinion_disagreement": 4,
+      "jealousy_and_repair": 3,
+      "quiet_end": 3
+    },
+    "dev": {
+      "campus_daily": 1,
+      "secret_crush": 1,
+      "playful_tease": 1,
+      "emotional_support": 1,
+      "study_and_projects": 1,
+      "life_share": 1,
+      "family_background": 1,
+      "opinion_disagreement": 1
+    },
+    "test": {
+      "campus_daily": 1,
+      "secret_crush": 1,
+      "playful_tease": 1,
+      "emotional_support": 1,
+      "study_and_projects": 1,
+      "life_share": 1,
+      "family_background": 1,
+      "jealousy_and_repair": 1
+    }
+  },
+  "assistant_replies": 346,
+  "user_messages": 346,
+  "turn_pairs": {
+    "min": 3,
+    "median": 4.0,
+    "max": 6
+  },
+  "reply_char_lengths": {
+    "min": 4,
+    "p10": 21,
+    "p50": 39,
+    "p90": 62,
+    "max": 107,
+    "mean": 41.09
+  },
+  "question_endings": 41,
+  "question_endings_only": 23,
+  "question_ratio": 0.1185,
+  "question_ending_ratio": 0.0665,
+  "action_replies": 39,
+  "action_ratio": 0.1127,
+  "exact_user_duplicate_strings": 0,
+  "cross_split_near_duplicate_user_messages": [],
+  "repeated_openings": [],
+  "forbidden_hits": [],
+  "errors": [],
+  "warnings": [],
+  "status": "pass",
+  "per_dialogue": [
+    {
+      "id": "song-pilot-001",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        36,
+        38,
+        51,
+        35,
+        24
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-002",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        36,
+        54,
+        41,
+        37,
+        37
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-003",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        53,
+        58,
+        55,
+        35
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-004",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        60,
+        36,
+        7,
+        42
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-005",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        59,
+        62,
+        47,
+        56,
+        60
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-006",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        54,
+        67,
+        52,
+        36,
+        57
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-007",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        33,
+        45,
+        27,
+        32
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-008",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        64,
+        48,
+        63,
+        28,
+        77
+      ],
+      "question_endings": 2,
+      "actions": 1
+    },
+    {
+      "id": "song-009",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        34,
+        40,
+        47,
+        34,
+        34
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-010",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        38,
+        68,
+        78,
+        39,
+        44
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-011",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        39,
+        39,
+        41,
+        45,
+        39
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-012",
+      "split": "train",
+      "category": "campus_daily",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        49,
+        88,
+        53,
+        53
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-013",
+      "split": "dev",
+      "category": "campus_daily",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        35,
+        73,
+        76,
+        70
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-014",
+      "split": "test",
+      "category": "campus_daily",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        55,
+        48,
+        58,
+        47
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-pilot-002",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        37,
+        48,
+        24,
+        28
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-016",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        28,
+        56,
+        52,
+        36
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-017",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        23,
+        23,
+        36,
+        22
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-018",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        12,
+        27,
+        18,
+        35,
+        39
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-019",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        31,
+        26,
+        44,
+        21
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-020",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        35,
+        55,
+        46,
+        29
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-021",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        23,
+        20,
+        6,
+        31,
+        15
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-022",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        22,
+        36,
+        19,
+        29
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-023",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        45,
+        52,
+        74,
+        44
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-024",
+      "split": "train",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        27,
+        53,
+        28,
+        39
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-025",
+      "split": "dev",
+      "category": "secret_crush",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        38,
+        29,
+        31,
+        25
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-026",
+      "split": "test",
+      "category": "secret_crush",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        8,
+        14,
+        36,
+        48,
+        24
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-027",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        50,
+        60,
+        53,
+        35
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-028",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        6,
+        19,
+        45,
+        27
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-029",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        17,
+        41,
+        15,
+        23,
+        37
+      ],
+      "question_endings": 1,
+      "actions": 0
+    },
+    {
+      "id": "song-030",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        16,
+        47,
+        38,
+        43
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-031",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        44,
+        40,
+        46,
+        25
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-032",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        31,
+        54,
+        32,
+        43
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-033",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        37,
+        50,
+        44,
+        41
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-034",
+      "split": "train",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        59,
+        44,
+        34,
+        26
+      ],
+      "question_endings": 2,
+      "actions": 1
+    },
+    {
+      "id": "song-035",
+      "split": "dev",
+      "category": "playful_tease",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        45,
+        31,
+        37,
+        31
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-036",
+      "split": "test",
+      "category": "playful_tease",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        22,
+        41,
+        38,
+        36,
+        26
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-pilot-003",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        12,
+        36,
+        58,
+        60,
+        29
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-038",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        14,
+        24,
+        25,
+        13,
+        28
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-039",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        48,
+        37,
+        42,
+        53
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-040",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        29,
+        27,
+        46,
+        23
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-041",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        4,
+        34,
+        49,
+        60
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-042",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        28,
+        44,
+        20,
+        23
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-043",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        10,
+        42,
+        29,
+        17,
+        12
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-044",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        38,
+        61,
+        39,
+        22
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-045",
+      "split": "dev",
+      "category": "emotional_support",
+      "pairs": 6,
+      "assistant_char_lengths": [
+        6,
+        16,
+        16,
+        30,
+        15,
+        28
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-046",
+      "split": "test",
+      "category": "emotional_support",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        26,
+        34,
+        35,
+        43,
+        28
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-047",
+      "split": "train",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        54,
+        59,
+        53,
+        38
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-048",
+      "split": "train",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        29,
+        50,
+        48,
+        35
+      ],
+      "question_endings": 1,
+      "actions": 0
+    },
+    {
+      "id": "song-049",
+      "split": "train",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        16,
+        25,
+        39,
+        21
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-050",
+      "split": "train",
+      "category": "study_and_projects",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        91,
+        52,
+        64,
+        51,
+        40
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-051",
+      "split": "train",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        40,
+        49,
+        48,
+        50
+      ],
+      "question_endings": 1,
+      "actions": 0
+    },
+    {
+      "id": "song-052",
+      "split": "train",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        52,
+        42,
+        71,
+        49
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-053",
+      "split": "dev",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        37,
+        50,
+        54,
+        48
+      ],
+      "question_endings": 1,
+      "actions": 0
+    },
+    {
+      "id": "song-054",
+      "split": "test",
+      "category": "study_and_projects",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        14,
+        40,
+        89,
+        50
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-055",
+      "split": "train",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        83,
+        78,
+        68,
+        59
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-056",
+      "split": "train",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        30,
+        74,
+        37,
+        33
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-057",
+      "split": "train",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        46,
+        50,
+        56,
+        35
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-058",
+      "split": "train",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        28,
+        62,
+        48,
+        44
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-059",
+      "split": "train",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        60,
+        56,
+        57,
+        45
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-060",
+      "split": "train",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        30,
+        32,
+        32,
+        29
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-061",
+      "split": "dev",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        50,
+        58,
+        72,
+        28
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-062",
+      "split": "test",
+      "category": "life_share",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        26,
+        52,
+        72,
+        29
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-pilot-004",
+      "split": "train",
+      "category": "family_background",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        58,
+        67,
+        71,
+        40,
+        33
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-064",
+      "split": "train",
+      "category": "family_background",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        42,
+        79,
+        17,
+        59
+      ],
+      "question_endings": 1,
+      "actions": 0
+    },
+    {
+      "id": "song-065",
+      "split": "train",
+      "category": "family_background",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        107,
+        86,
+        55,
+        44
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-066",
+      "split": "train",
+      "category": "family_background",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        42,
+        48,
+        39,
+        22
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-067",
+      "split": "dev",
+      "category": "family_background",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        58,
+        49,
+        42,
+        42,
+        32
+      ],
+      "question_endings": 1,
+      "actions": 1
+    },
+    {
+      "id": "song-068",
+      "split": "test",
+      "category": "family_background",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        37,
+        47,
+        68,
+        61
+      ],
+      "question_endings": 1,
+      "actions": 0
+    },
+    {
+      "id": "song-069",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        42,
+        81,
+        29,
+        36,
+        43
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-070",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        40,
+        46,
+        40,
+        27
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-071",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 5,
+      "assistant_char_lengths": [
+        73,
+        98,
+        72,
+        70,
+        50
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-072",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        33,
+        83,
+        51,
+        39
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-073",
+      "split": "dev",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        52,
+        41,
+        36,
+        33
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-pilot-005",
+      "split": "train",
+      "category": "jealousy_and_repair",
+      "pairs": 6,
+      "assistant_char_lengths": [
+        17,
+        42,
+        48,
+        30,
+        49,
+        54
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-075",
+      "split": "train",
+      "category": "jealousy_and_repair",
+      "pairs": 6,
+      "assistant_char_lengths": [
+        22,
+        53,
+        36,
+        51,
+        21,
+        26
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-076",
+      "split": "train",
+      "category": "jealousy_and_repair",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        30,
+        39,
+        58,
+        22
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-077",
+      "split": "test",
+      "category": "jealousy_and_repair",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        36,
+        50,
+        21,
+        37
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-078",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 3,
+      "assistant_char_lengths": [
+        28,
+        19,
+        5
+      ],
+      "question_endings": 0,
+      "actions": 0
+    },
+    {
+      "id": "song-079",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 4,
+      "assistant_char_lengths": [
+        24,
+        53,
+        32,
+        13
+      ],
+      "question_endings": 0,
+      "actions": 1
+    },
+    {
+      "id": "song-080",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 3,
+      "assistant_char_lengths": [
+        35,
+        30,
+        14
+      ],
+      "question_endings": 0,
+      "actions": 0
+    }
+  ]
+}

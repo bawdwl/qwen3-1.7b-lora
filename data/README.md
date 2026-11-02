@@ -1,6 +1,11 @@
 # 数据说明
 
-本仓库不附带原始数据、衍生训练集或模型权重。
+本仓库不附带 Chat-Huanhuan 的原始数据、衍生训练集或模型权重。
+
+本项目原创角色许澄和宋知意的教师模型合成数据位于：
+
+- `datasets/xu-cheng/`
+- `datasets/song-zhiyi/`
 
 参考实验使用 Chat-Huanhuan 项目公开的 `huanhuan.json`：
 
