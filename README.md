@@ -21,8 +21,9 @@ Qwen3-1.7B 单角色对话 LoRA 的可复现实验仓库。
 | 许澄 | 80 段训练 / 20 段验证；576 / 142 个回复目标 | 2 轮，144 步 | 作者偏好第 1 轮 + 核心提示 |
 | 宋知意 | 64 / 8 / 8 段；276 / 35 / 35 个回复目标 | 2 轮，70 步 | 作者偏好第 1.5 轮 + 精简训练提示 |
 | 甄嬛 | 3,729 条单角色问答 | 3 轮，702 步 | 第 1 轮附近最稳；后两轮出现短句复读 |
+| 凉宫春日 | 1,009 训练 / 115 验证 | 2 轮，254 步 | 作者偏好第 1.5 轮 + 角色卡；质量门禁 No-Go |
 
-四个实验共同表明：**LoRA 可以快速学习角色称谓和语气，但数据分布、提示词和选模方式
+五个实验共同表明：**LoRA 可以快速学习角色称谓和语气，但数据分布、提示词和选模方式
 对最终质量的影响往往大于继续增加训练轮数。**
 
 完整分析见
@@ -37,15 +38,16 @@ prompts/       简短、核心和完整角色提示词
 scripts/       数据准备、聊天、检查点评测和数据校验
 src/           Qwen3 + PEFT 的小型推理库
 docs/          实验记录、失败分析和提示词指南
-data/          Chat-Huanhuan 第三方数据获取说明
+data/          Chat-Huanhuan、ChatHaruhi 第三方数据与许可说明
 ```
 
 主要文档：
 
-- [四组 LoRA 实验复盘](docs/FINETUNING_CASE_STUDY.md)
+- [五组 LoRA 实验复盘](docs/FINETUNING_CASE_STUDY.md)
 - [Qwen3-1.7B 微调与角色提示指南](docs/MODEL_AND_PROMPT_GUIDE.md)
 - [甄嬛实验记录](docs/EXPERIMENT.md)
 - [Chat-Huanhuan 复现边界](experiments/huanhuan/README.md)
+- [ChatHaruhi 复现边界与结果](experiments/haruhi/README.md)
 
 ## 数据集
 
@@ -99,6 +101,7 @@ models/qwen3-1.7b/
 - [`configs/xu_cheng_qwen3_1_7b_lora.yaml`](configs/xu_cheng_qwen3_1_7b_lora.yaml)
 - [`configs/song_zhiyi_qwen3_1_7b_lora.yaml`](configs/song_zhiyi_qwen3_1_7b_lora.yaml)
 - [`configs/huanhuan_qwen3_1_7b_lora.yaml`](configs/huanhuan_qwen3_1_7b_lora.yaml)
+- [`configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml`](configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml)
 
 ## 训练
 
@@ -122,6 +125,13 @@ python scripts/prepare_huanhuan_author_close.py \
   --output-dir data/prepared/huanhuan-author-close-v1
 
 llamafactory-cli train configs/huanhuan_qwen3_1_7b_lora.yaml
+```
+
+凉宫春日实验使用 ChatHaruhi 54K 聚合数据中固定版本的凉宫春日子集。数据不随仓库分发，
+准备方式和许可边界见 [`experiments/haruhi/README.md`](experiments/haruhi/README.md)。
+
+```bash
+llamafactory-cli train configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml
 ```
 
 统一训练配置：
@@ -249,6 +259,8 @@ Base + 最终提示词
 - 许澄、宋知意数据是原创虚构角色的教师模型合成内容；
 - 仓库不包含模型权重、Adapter、API Key 或真实用户聊天记录；
 - Chat-Huanhuan 数据源自影视剧本，第三方数据和权重未上传；
+- ChatHaruhi 聚合数据卡与上游说明存在 CC-BY-4.0、CC-BY-NC-4.0 声明冲突，第三方数据、
+  Adapter 和权重均未上传；
 - MIT 只适用于本仓库原创代码，不代表第三方数据、基座模型或衍生模型获得相同授权；
 - 使用第三方数据前请阅读 [`data/README.md`](data/README.md)。
 
