@@ -17,6 +17,18 @@ Qwen3-1.7B 单角色对话 LoRA 的可复现实验工程。
 - [许澄数据集](datasets/xu-cheng/README.md)：100 段校准对话和 30 段隔离测试；
 - [宋知意数据集](datasets/song-zhiyi/README.md)：80 段校园陪伴对话。
 
+四次 LoRA 实验的核心对比：
+
+| 实验 | 数据 | 观察结果 |
+|---|---|---|
+| RoleBench 孙悟空 | 1,260 训练样本，2 轮 | Base + 角色卡更自然，LoRA 过度简短 |
+| 许澄 | 80 段会话，576 个目标，2 轮 | 作者偏好第 1 轮 + 核心提示；安全风险仍需处理 |
+| 宋知意 | 64 段会话，276 个目标，2 轮 | 作者偏好第 1.5 轮 + 精简训练提示 |
+| 甄嬛 | 3,729 条单轮问答，3 轮 | 第 1 轮最平衡，后段出现固定句复读 |
+
+甄嬛实验的第三方数据和权重未上传，只保留配置、统计和复盘：
+[`experiments/huanhuan/README.md`](experiments/huanhuan/README.md)。
+
 ## 实验摘要
 
 已验证的参考实验：
@@ -91,6 +103,11 @@ models/qwen3-1.7b/
 也可将
 [`configs/huanhuan_qwen3_1_7b_lora.yaml`](configs/huanhuan_qwen3_1_7b_lora.yaml)
 中的 `model_name_or_path` 改成 Hugging Face 或 ModelScope 模型 ID。
+
+仓库同时提供：
+
+- [`configs/xu_cheng_qwen3_1_7b_lora.yaml`](configs/xu_cheng_qwen3_1_7b_lora.yaml)
+- [`configs/song_zhiyi_qwen3_1_7b_lora.yaml`](configs/song_zhiyi_qwen3_1_7b_lora.yaml)
 
 ## 准备数据
 
@@ -182,6 +199,12 @@ python scripts/evaluate_checkpoints.py \
 
 自动指标只用于诊断，不能代替人工盲评。
 
+不加载模型也可以验证数据完整性：
+
+```bash
+python scripts/validate_datasets.py
+```
+
 ## 实验复盘
 
 不同数据集和训练轮数产生了不同结果：
@@ -193,6 +216,12 @@ python scripts/evaluate_checkpoints.py \
 原因、证据和改进方向见
 [`docs/FINETUNING_CASE_STUDY.md`](docs/FINETUNING_CASE_STUDY.md)。
 
+参数、数据规模和角色提示词长度建议见
+[`docs/MODEL_AND_PROMPT_GUIDE.md`](docs/MODEL_AND_PROMPT_GUIDE.md)。
+
+Qwen3-1.7B 适合单角色语气适配、消费级训练和手机端 Demo。它的知识、复杂推理、安全边界和
+长上下文能力有限，不能被 LoRA 修复；产品级聊天仍应配合更大模型、检索、记忆或应用层安全规则。
+
 ## 数据与模型许可
 
 本仓库原创代码使用 MIT License。
@@ -200,6 +229,6 @@ python scripts/evaluate_checkpoints.py \
 - Qwen3 基座和 Adapter 仍遵循上游模型许可；
 - Chat-Huanhuan 数据源自影视剧本，项目说明包含学习研究与非商业限制；
 - 许澄和宋知意数据是本项目原创角色的教师模型合成数据，不包含真实用户对话；
-- 因此本仓库不附带数据、模型或 Adapter；
+- 因此本仓库不附带 Chat-Huanhuan 原始数据、任何模型权重或 Adapter；
 - 使用数据前请阅读 [`data/README.md`](data/README.md) 和
   [`docs/EXPERIMENT.md`](docs/EXPERIMENT.md)。

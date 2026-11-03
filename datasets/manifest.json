@@ -1,0 +1,71 @@
+{
+  "schema_version": "shiyu-original-character-datasets-v1",
+  "provenance": {
+    "type": "synthetic_teacher_model_dialogues",
+    "contains_real_user_chats": false,
+    "contains_model_weights": false
+  },
+  "xu_cheng": {
+    "source_sessions": {
+      "train": 80,
+      "validation": 20,
+      "final_test": 30
+    },
+    "assistant_targets": {
+      "train": 576,
+      "validation": 142
+    },
+    "files": {
+      "datasets/xu-cheng/source/train_sessions.jsonl": {
+        "rows": 80,
+        "sha256": "c2749cde10a1c72814956fbcc382cfb6a74190a106a77895c2b814300e35ebe2"
+      },
+      "datasets/xu-cheng/source/validation_sessions.jsonl": {
+        "rows": 20,
+        "sha256": "5c803e69907e166a47c7dfdcbb1b2ea58cd31ba61bdbced4ea2371197bd5a703"
+      },
+      "datasets/xu-cheng/source/final_test_sessions.jsonl": {
+        "rows": 30,
+        "sha256": "d7ba5380ba8885af33fd22df0f2eadbc18b483594129a1b966a2995a30e08e46"
+      },
+      "datasets/xu-cheng/sft/train.jsonl": {
+        "rows": 576,
+        "sha256": "eeb39805647ab85497932d2675d2f51568865d5e2b6d3cee3f20af0b394cdfd6"
+      },
+      "datasets/xu-cheng/sft/validation.jsonl": {
+        "rows": 142,
+        "sha256": "ac9d01ce79e03673c447c40b011c8f82251ffa8ac1b9716b1d19893d4f49db1e"
+      }
+    }
+  },
+  "song_zhiyi": {
+    "source_dialogues": 80,
+    "assistant_targets": {
+      "train": 276,
+      "validation": 35,
+      "test": 35
+    },
+    "files": {
+      "datasets/song-zhiyi/sft/train.jsonl": {
+        "rows": 276,
+        "sha256": "8b43411dd6b3a8bef5b70888ab239ce6e92c29b56e04f3346a1e73b48d4d9fa6"
+      },
+      "datasets/song-zhiyi/sft/validation.jsonl": {
+        "rows": 35,
+        "sha256": "58d9543481d0d6f96791ae97e59d9b30c9c6adb4b7fe736dabacde1ebbbd2e4d"
+      },
+      "datasets/song-zhiyi/sft/test.jsonl": {
+        "rows": 35,
+        "sha256": "bb6949c0925e98dfd27290c5cdbbcf3e7ca8fd29c2a8ff22561f45ede0710340"
+      },
+      "datasets/song-zhiyi/source/scenarios.json": {
+        "rows": 80,
+        "sha256": "a09abf6e47100d749ada991e697fa79f82a9d77c932236676396ab17be259743"
+      },
+      "datasets/song-zhiyi/source/dialogues.json": {
+        "rows": 80,
+        "sha256": "39833e5d6d02f73a06399d461d61748533c41b8f7295d078b58c0a7e61760a2e"
+      }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "song_zhiyi_train": {
+    "file_name": "train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "song_zhiyi_validation": {
+    "file_name": "validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "song_zhiyi_test": {
+    "file_name": "test.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  }
+}

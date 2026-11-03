@@ -1,5 +1,9 @@
 # 实验记录
 
+本文件保留首次 Chat-Huanhuan 实验的具体配置。四个角色的统一对比见
+[`FINETUNING_CASE_STUDY.md`](FINETUNING_CASE_STUDY.md)，参数与提示词建议见
+[`MODEL_AND_PROMPT_GUIDE.md`](MODEL_AND_PROMPT_GUIDE.md)。
+
 ## 目标
 
 验证 Qwen3-1.7B 能否在消费级 8 GB 显卡上通过 LoRA 学习单角色对白，并比较不同训练

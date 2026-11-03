@@ -1,0 +1,30 @@
+{
+  "xu_cheng_train": {
+    "file_name": "train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "xu_cheng_validation": {
+    "file_name": "validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  }
+}

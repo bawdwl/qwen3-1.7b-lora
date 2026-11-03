@@ -3,6 +3,11 @@ data/source/
 data/prepared/
 models/
 outputs/
+*.safetensors
+*.ckpt
+*.onnx
+*.mnn
+*.zip
 
 # Python
 __pycache__/

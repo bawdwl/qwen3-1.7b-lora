@@ -11,6 +11,10 @@
 
 所有 `user` 和 `assistant` 内容均为教师模型按项目角色设定生成的虚构对话，不包含真实用户聊天记录。
 
+Chat-Huanhuan 的甄嬛数据来自第三方影视剧本衍生数据，因此只保留实验配置和汇总结果，
+不放入本仓库。见
+[`experiments/huanhuan/README.md`](../experiments/huanhuan/README.md)。
+
 ## 文件结构
 
 每个角色包含：
