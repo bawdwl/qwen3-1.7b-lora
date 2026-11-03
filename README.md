@@ -10,8 +10,8 @@ Qwen3-1.7B 单角色对话 LoRA 的可复现实验仓库。
 - 微调后为什么会出现回答变短、模式坍塌和复读；
 - 1.7B 模型适合做到什么程度。
 
-仓库提供数据、训练配置、推理入口、检查点评测脚本和失败复盘。它不是完整的聊天 App，
-也不包含模型权重或 Adapter。
+仓库提供数据、训练配置、推理入口、检查点评测脚本、失败复盘，以及两个原创角色
+作者偏好的 PEFT LoRA Adapter。它不是完整的聊天 App，也不包含 Qwen3 基座权重。
 
 ## 已完成实验
 
@@ -38,6 +38,7 @@ prompts/       简短、核心和完整角色提示词
 scripts/       数据准备、聊天、检查点评测和数据校验
 src/           Qwen3 + PEFT 的小型推理库
 docs/          实验记录、失败分析和提示词指南
+weights/       两个原创角色作者偏好的 LoRA Adapter 和对应提示词
 data/          Chat-Huanhuan、ChatHaruhi 第三方数据与许可说明
 ```
 
@@ -48,6 +49,9 @@ data/          Chat-Huanhuan、ChatHaruhi 第三方数据与许可说明
 - [甄嬛实验记录](docs/EXPERIMENT.md)
 - [Chat-Huanhuan 复现边界](experiments/huanhuan/README.md)
 - [ChatHaruhi 复现边界与结果](experiments/haruhi/README.md)
+- [公开 Adapter 与本地 Base/LoRA 对照](weights/README.md)
+- [同一提示词下的对照步骤](docs/LOCAL_COMPARISON.md)
+- [对话截图命名与记录规范](screenshots/README.md)
 
 ## 数据集
 
@@ -63,6 +67,21 @@ data/          Chat-Huanhuan、ChatHaruhi 第三方数据与许可说明
 
 文件行数和 SHA-256 记录在
 [`datasets/manifest.json`](datasets/manifest.json)。
+
+## 公开的 LoRA Adapter
+
+仓库包含两个体积约 33 MiB 的 PEFT Adapter：
+
+| 角色 | 检查点 | 配套提示词 | 说明 |
+|---|---|---|---|
+| 宋知意 | 第 1.5 轮 / 70 步中的第 52 步 | [`weights/song-zhiyi-epoch-2-half/system_prompt.txt`](weights/song-zhiyi-epoch-2-half/system_prompt.txt) | 作者体验偏好；求职 Demo 候选 |
+| 许澄 | 第 1 轮 / 144 步中的第 72 步 | [`weights/xu-cheng-epoch-1/system_prompt.txt`](weights/xu-cheng-epoch-1/system_prompt.txt) | 作者体验偏好；仍是实验质量，不代表安全通过 |
+
+Base 与 LoRA 必须使用同一提示词、同一历史、同一采样参数和同一基座权重。
+具体命令见 [`docs/LOCAL_COMPARISON.md`](docs/LOCAL_COMPARISON.md)。
+
+受底层素材或数据许可边界限制，甄嬛、凉宫春日和孙悟空 Adapter 不公开。
+限制说明见 [`weights/README.md`](weights/README.md)。
 
 ## 快速开始
 
@@ -257,7 +276,8 @@ Base + 最终提示词
 
 - 本仓库原创代码采用 MIT License；
 - 许澄、宋知意数据是原创虚构角色的教师模型合成内容；
-- 仓库不包含模型权重、Adapter、API Key 或真实用户聊天记录；
+- 仓库包含许澄、宋知意两个原创角色的 LoRA Adapter，不包含 Qwen3 基座权重、
+  合并模型、量化模型、API Key 或真实用户聊天记录；
 - Chat-Huanhuan 数据源自影视剧本，第三方数据和权重未上传；
 - ChatHaruhi 聚合数据卡与上游说明存在 CC-BY-4.0、CC-BY-NC-4.0 声明冲突，第三方数据、
   Adapter 和权重均未上传；

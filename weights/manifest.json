@@ -1,0 +1,42 @@
+{
+  "schema_version": "lora-release-manifest-v1",
+  "base_model": "Qwen/Qwen3-1.7B",
+  "adapters": [
+    {
+      "character": "宋知意",
+      "checkpoint": "epoch-2-half",
+      "training_progress": "1.5 epochs / step 52 of 70",
+      "status": "author-preferred-demo-candidate",
+      "files": {
+        "adapter_model.safetensors": {
+          "bytes": 34916720,
+          "sha256": "0E064882030F21B65872C6D80DCA36B9A41EEEB053832AB2EA1F47E777997933"
+        },
+        "adapter_config.json": {
+          "sha256": "3101C9455988C648CAED68B9B233FB119B5AF46285C1BB0D2C87D01ED40051E4"
+        },
+        "system_prompt.txt": {
+          "sha256": "4279232C21AEA9D5315DC391E7164CF622EE77CE25F438EF6637A8830B4BD81C"
+        }
+      }
+    },
+    {
+      "character": "许澄",
+      "checkpoint": "epoch-1",
+      "training_progress": "1 epoch / step 72 of 144",
+      "status": "author-preferred-experimental-not-a-safety-pass",
+      "files": {
+        "adapter_model.safetensors": {
+          "bytes": 34916720,
+          "sha256": "651C15DFD79851BE2E6AA28ACDC7052BD2AE1CBF593B808E32F1E9C61BA0FF5D"
+        },
+        "adapter_config.json": {
+          "sha256": "9CE03D7CDD368B98E2DC0FAEC3F900031235F4C7A336C24BD00E7D4EE67A0A3E"
+        },
+        "system_prompt.txt": {
+          "sha256": "D1535A496E677B4BDDD10E6AF4EB569FB98FBA0226497E1F04554579218916A4"
+        }
+      }
+    }
+  ]
+}

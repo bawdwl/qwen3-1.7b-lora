@@ -8,6 +8,8 @@ outputs/
 *.onnx
 *.mnn
 *.zip
+!weights/
+!weights/**/*.safetensors
 
 # Python
 __pycache__/
