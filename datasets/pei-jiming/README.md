@@ -93,3 +93,15 @@ length-fit 平均分高于 Base，但仍比 Base 更短，并保留 1 个硬失�
 
 这只是小规模合成数据和单一 LLM 裁判的结果，不是人工盲评或生产质量证明。详细限制与
 失败样本分析放在主要结果文档中。
+
+## MNN Q8 发布
+
+选中的第 1 轮 Adapter 已合并为 BF16 模型并以 MNN 3.5.0 Q8 block64 发布：
+
+<https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-pei-jiming-mnn-q8>
+
+本次发布已验证：
+
+- Adapter 与合并模型的 next-token top-1 在 3/3 固定样本上一致；
+- Q8 包可在 Windows CPU 的 MNN 3.5.0 中加载并正常结束生成；
+- 尚未完成 Android 真机性能、温升和长对话复测。

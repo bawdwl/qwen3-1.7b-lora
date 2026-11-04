@@ -23,6 +23,17 @@ the earlier higher-capacity recipe collapsed toward short answers. It is about
 The base model weights are not included. Load the pinned base model yourself
 and supply it with `--base-model`.
 
+## MNN Q8 releases
+
+The merged MNN 3.5.0 Q8 model packages are published on ModelScope:
+
+- [宋知意](https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-song-zhiyi-mnn-q8)
+- [许澄](https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-xu-cheng-mnn-q8)
+- [裴既明](https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-pei-jiming-mnn-q8)
+
+These packages contain MNN weights, tokenizer, role prompt, export metadata and
+file hashes. They are text-only Android/MNN Chat artifacts, not GPTQ models.
+
 ## Not released
 
 The repository intentionally excludes:

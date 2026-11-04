@@ -352,6 +352,20 @@ docs/                             复现、参数、参考、结果
 | 孙悟空 | RoleBench 衍生数据 | 因第三方衍生边界不发布 |
 | 凉宫春日 | ChatHaruhi 固定子集 | 因上游许可声明冲突不发布 |
 
+### ModelScope MNN Q8 模型
+
+三个原创角色的 LoRA 已合并到 Qwen3-1.7B，并以 MNN 3.5.0 Q8 block64 发布到 ModelScope：
+
+| 角色 | 检查点 | MNN 模型 |
+|---|---|---|
+| 宋知意 | 1.5 轮 | <https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-song-zhiyi-mnn-q8> |
+| 许澄 | 第 1 轮 | <https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-xu-cheng-mnn-q8> |
+| 裴既明 | 第 1 轮 | <https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-pei-jiming-mnn-q8> |
+
+这些模型包面向 Android/MNN Chat 的本地文字推理，包含角色提示词、导出参数和文件哈希。
+Q8 是 MNN 权重量化格式，不是 GPTQ。许澄和裴既明是实验版，不代表生产级安全通过；
+端侧性能仍需在目标手机上复测。
+
 截图只是单次实际对话，不是统计证明。训练 loss、自动指标和单一 LLM 裁判都不能替代
 固定开发集、封存测试集和人工盲评。
 
