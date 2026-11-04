@@ -28,7 +28,7 @@ def main() -> None:
     failures: list[str] = []
     checked = 0
     for markdown in sorted(root.rglob("*.md")):
-        if ".git" in markdown.parts:
+        if any(part in markdown.parts for part in {".git", ".venv", "outputs"}):
             continue
         text = strip_fenced_code(markdown.read_text(encoding="utf-8"))
         for raw_target in LINK_RE.findall(text):

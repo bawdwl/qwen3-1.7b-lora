@@ -22,9 +22,9 @@ import argparse
 import hashlib
 import json
 import math
-import statistics
+import platform
 import sys
-from dataclasses import dataclass
+from importlib.metadata import PackageNotFoundError, version
 from pathlib import Path
 from typing import Any
 
@@ -33,6 +33,13 @@ import yaml
 
 IGNORE_INDEX = -100
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def installed_version(package: str) -> str | None:
+    try:
+        return version(package)
+    except PackageNotFoundError:
+        return None
 
 
 def parse_args() -> argparse.Namespace:
@@ -419,6 +426,22 @@ def train(config_path: Path, config: dict[str, Any], args: argparse.Namespace) -
     )
     model = get_peft_model(model, lora_config)
     model.print_trainable_parameters()
+    report["model_parameters"] = {
+        "trainable": int(model.num_parameters(only_trainable=True)),
+        "total": int(model.num_parameters()),
+    }
+    report["environment"] = {
+        "python": platform.python_version(),
+        "torch": installed_version("torch"),
+        "transformers": installed_version("transformers"),
+        "peft": installed_version("peft"),
+        "accelerate": installed_version("accelerate"),
+        "cuda": torch.version.cuda,
+        "gpu": torch.cuda.get_device_name(0),
+        "gpu_total_memory_gb": round(
+            torch.cuda.get_device_properties(0).total_memory / 1024**3, 2
+        ),
+    }
 
     class DataCollator:
         def __init__(self, pad_token_id: int):
@@ -603,6 +626,10 @@ def train(config_path: Path, config: dict[str, Any], args: argparse.Namespace) -
     trainer.save_model(output_dir)
     report["training"]["completed"] = True
     report["training"]["final_global_step"] = int(trainer.state.global_step)
+    report["training"]["log_history"] = trainer.state.log_history
+    adapter_weight = output_dir / "adapter_model.safetensors"
+    if adapter_weight.is_file():
+        report["training"]["final_adapter_sha256"] = sha256_file(adapter_weight)
     (output_dir / "training-audit.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",

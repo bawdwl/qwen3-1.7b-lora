@@ -1,102 +1,108 @@
-# 从零复现 Qwen3-1.7B 单角色 LoRA
+# Qwen3-1.7B LoRA 通用复现指南
 
-本文是仓库的正式复现指南。目标是让一个没有本项目历史文件、聊天数据库或旧虚拟环境的
-人，能够：
+这不是某个角色专用的训练说明书。本文从零说明如何为任意对话、问答或任务数据训练
+Qwen3-1.7B LoRA，包括环境安装、数据选择与清洗、参数选择、训练、监控、检查点比较、
+推理和常见故障。仓库中的三个角色只是可直接运行的案例。
 
-1. 安装兼容的 Python 环境；
-2. 下载固定版本的 Qwen3-1.7B；
-3. 检查训练数据结构和 split；
-4. 实际执行 assistant-only LoRA 训练；
-5. 观察 loss、显存、长度和复读风险；
-6. 比较 Base、半轮、整轮和后续检查点；
-7. 使用仓库中的 Adapter 做推理；
-8. 判断哪些结果可以复现，哪些结论只适用于本项目的实验设置。
+先给出最重要的结论：
 
-它描述的是小规模单角色实验，不是多角色产品训练平台，也不是论文级复现。
+- SFT 的输入必须是“提示与目标回答”，而不是随便下载的纯文本；
+- 每一轮必须只监督目标 assistant，不训练 system 和用户问题；
+- train/validation/test 要按完整会话切分；
+- rank、学习率和 epoch 是实验变量，不能只看 loss 选；
+- Qwen3 的训练和推理必须使用一致 Chat Template 及 thinking 设置；
+- 8 GB 显存可以从 rank 4/8、batch 1、梯度累积 8、BF16 LoRA 开始。
 
-## 1. 先理解仓库里有什么
+## 1. 训练目标与 LoRA 适用范围
 
-### 1.1 代码
+全参数微调会更新 Qwen3-1.7B 的约 17 亿参数和 Adam 优化器状态。LoRA 冻结基座，只在部分
+线性层旁边训练小矩阵。PEFT 官方文档说明，这种方式显著降低显存、存储和每个任务需要
+保存的权重体积；本项目的 Adapter 只有数 MiB 到数十 MiB。
 
-- `scripts/train_lora.py`：仓库内自包含的训练入口；
-- `scripts/chat_checkpoint.py`：加载 Base 或 PEFT Adapter 进行终端对话；
-- `scripts/evaluate_checkpoints.py`：固定问题集上的 Base/检查点对照；
-- `scripts/validate_datasets.py`：数据行数、格式、split 和 SHA-256 检查；
-- `src/lora_chat.py`：Transformers + PEFT 推理封装。
+适合 LoRA：
 
-训练不依赖私有服务或聊天 App。数据、训练配方和推理入口都在本仓库中。
+- 改变回答风格、格式、角色口吻或业务流程；
+- 单领域问答和指令跟随；
+- 让小模型更稳定地遵守已有能力范围；
+- 在消费级 GPU 上做小规模实验。
 
-### 1.2 可完整复现的实验
+不适合只靠 LoRA 解决：
 
-| 角色 | 数据已包含 | 发布 Adapter | 可复现范围 |
-|---|---|---|---|
-| 宋知意 | 是 | 是 | 数据检查、训练、Base/LoRA 对照、已有 Adapter 推理 |
-| 许澄 | 是 | 是 | 数据检查、训练、Base/LoRA 对照、已有 Adapter 推理 |
-| 裴既明 | 是 | 是 | 数据检查、训练、Base/LoRA 对照、已有 Adapter 推理 |
-| 孙悟空 | 否 | 否 | 只保留配置说明和实际对话截图，第三方衍生数据不公开 |
-| 凉宫春日 | 否 | 否 | 只保留来源、许可冲突和实验记录，第三方数据和权重不公开 |
+- 让 1.7B 从零掌握大量新事实；
+- 替代 RAG、数据库或工具调用；
+- 用几百条数据获得可靠医学、法律或金融判断；
+- 以训练 loss 代替产品指标和安全评测；
+- 多角色产品为每个角色无限增加独立 Adapter。
 
-“完整复现”表示命令和所需数据都在仓库中。由于 CUDA、PyTorch、GPU 型号和并行环境可能
-不同，不承诺与历史训练逐 bit 相同。
+## 2. 选择正确基座和聊天模式
 
-### 1.3 数据来源
+### 2.1 使用 `Qwen/Qwen3-1.7B`
 
-许澄、宋知意、裴既明都是项目原创虚构角色。全部训练对白均由教师大语言模型根据项目
-作者定义的角色设定、场景规范和审核规则生成。它们不包含真实用户聊天、真实社交平台
-抓取内容或原小说对白。
-
-具体来源：
-
-| 数据集 | 角色来源 | 对话来源 | 冻结规模 |
-|---|---|---|---|
-| 许澄 | 项目原创 Character Bible | 网页 GPT 系列；60 个会话记录 `GPT-6`，70 个早期会话 `unknown` | 80/20/30 个会话；576/142 个训练/验证目标 |
-| 宋知意 | 项目原创角色卡 | OpenCode `deepseek-v4.1-flash` 按 80 个校园场景生成 | 64/8/8 个会话；276/35/35 个目标 |
-| 裴既明 | 项目原创乙女向角色圣经 | OpenCode `deepseek-v4.1-flash` 按 120 个场景生成，加 60 条长回复分支 | 96/13/11 个场景；577/54/45 个目标 |
-
-数据中保留 teacher prompt、角色设定和审计文件，目的是让使用者能判断数据是怎样产生的，
-也能按同样规范制作自己的角色数据。
-
-第三方实验边界：
-
-- 孙悟空使用过 RoleBench 衍生数据，但当前仓库不重新分发数据或 Adapter；
-- 凉宫春日使用过 ChatHaruhi 54K 聚合数据中的固定子集，但上游数据许可说明冲突，
-  当前仓库不重新分发数据或 Adapter；
-- 截图只能说明作者实际体验过一次对话，不是统计实验结果。
-
-## 2. 硬件和软件
-
-历史训练在一台 `RTX 4060 Laptop GPU 8 GB` 上完成。推荐最低配置：
-
-- NVIDIA GPU，8 GB 显存；
-- 16 GB 系统内存，建议 32 GB；
-- 10 GB 以上空闲磁盘用于 PyTorch、Qwen3 和 Adapter；
-- Windows 10/11 或 Linux；
-- Python 3.11；
-- 支持 BF16 的 CUDA 环境。
-
-历史 Adapter 元数据记录的软件版本：
+本仓库使用已完成后训练的通用 Chat 模型：
 
 ```text
-Python       3.11.17
-PyTorch      2.13.0+cu126
-Transformers 5.20.2
-PEFT         0.21.2
-Accelerate   1.15.0
+Qwen/Qwen3-1.7B
+revision 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e
 ```
 
-`requirements.txt` 固定了这些非 PyTorch 版本。PyTorch 需要按操作系统和 CUDA 版本从
-官方源安装。安装后先验证：
+不要用以下模型冒充同一实验：
+
+- `Qwen3-1.7B-Base`：缺少同等的指令对话后训练；
+- GPTQ/AWQ/MNN 量化模型：数值格式不同；
+- `Qwen3-0.6B` 或 `4B`：容量和 Tokenizer/结构不同；
+- 其他 revision：Chat Template 或模型行为可能变化。
+
+模型卡要求 Transformers 至少支持 `qwen3` 架构。官方当前建议使用兼容的新版本；本项目在
+`requirements.txt` 固定了历史训练版本。
+
+### 2.2 thinking 与 non-thinking
+
+Qwen3 支持两种模式：
+
+- `enable_thinking=True`：先产生思考内容，适合复杂推理；
+- `enable_thinking=False`：直接回答，适合角色聊天、分类、抽取、客服和低延迟任务。
+
+训练与推理要保持一致。角色数据通常不含 `<think>` 轨迹，本项目配置使用
+`qwen3_nothink`，`train_lora.py` 通过 `enable_thinking=False` 应用 Chat Template。
+
+如果误用 thinking 模式训练不含思考过程的数据，模型可能学到空思考块、额外标记或不稳定
+输出。若目标是推理任务，应准备包含完整思考轨迹的数据，并在推理端保留思考解析。
+
+## 3. 安装并验证环境
+
+### 3.1 推荐硬件
+
+本项目验证过：
+
+- NVIDIA RTX 4060 Laptop GPU，8 GB 显存；
+- 单卡 BF16 LoRA；
+- 输入最大约 1,024 Token；
+- Qwen3-1.7B 完整 BF16 基座；
+- 约 4.3–4.6 GiB 峰值已分配显存，操作系统的 CUDA context 还会占额外显存。
+
+推荐最低配置：
+
+| 项目 | 最低 | 更稳妥 |
+|---|---:|---:|
+| GPU 显存 | 8 GB | 12–16 GB |
+| 系统内存 | 16 GB | 32 GB |
+| 空闲磁盘 | 10 GB | 20 GB |
+| Python | 3.11 | 3.11 |
+| CUDA | 12.x | 与 PyTorch wheel 完全匹配 |
+
+低于 6 GB 时，本仓库的 BF16 LoRA 路径很可能无法运行。可选择 LLaMA-Factory 或 TRL 的
+QLoRA 路径，但这会产生另一种实验条件，不应与 BF16 结果直接排名。
+
+先确认 NVIDIA 驱动可见：
 
 ```bash
-python -c "import torch; print(torch.__version__); print(torch.cuda.is_available()); print(torch.cuda.get_device_name(0))"
+nvidia-smi
 ```
 
-输出必须是 `True` 并显示 NVIDIA GPU。`False` 时停止训练，不要用 CPU 跑通后声称复现了
-历史实验。
+必须看到 GPU 名称、驱动和 CUDA 信息。若命令不存在，先安装与 GPU 匹配的 NVIDIA 驱动，
+并确认 `python -m pip show torch` 指向包含 CUDA 的 wheel。
 
-## 3. 从干净目录开始
-
-克隆仓库并创建隔离环境：
+### 3.2 Windows
 
 ```powershell
 git clone https://github.com/bawdwl/qwen3-1.7b-lora.git
@@ -106,7 +112,24 @@ python -m venv .venv
 python -m pip install -U pip
 ```
 
-Linux：
+安装与机器匹配的 CUDA PyTorch：
+
+```powershell
+python -m pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu126
+python -m pip install -r requirements.txt
+```
+
+`cu126` 是历史环境。机器驱动或 CUDA 不同时，应根据 PyTorch 官方 selector 替换 wheel，
+不要把 CPU wheel 混进训练环境。
+
+如果 PowerShell 阻止虚拟环境激活，可在当前进程临时解除脚本限制：
+
+```powershell
+Set-ExecutionPolicy -Scope Process Bypass
+.\.venv\Scripts\Activate.ps1
+```
+
+### 3.3 Linux
 
 ```bash
 git clone https://github.com/bawdwl/qwen3-1.7b-lora.git
@@ -114,34 +137,40 @@ cd qwen3-1.7b-lora
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -U pip
-```
-
-安装 CUDA PyTorch。以下示例匹配历史 CUDA 12.6 环境；如果本机需要其他 CUDA，请使用
-PyTorch 官网对应命令：
-
-```bash
 python -m pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu126
-```
-
-再安装其他固定依赖：
-
-```bash
 python -m pip install -r requirements.txt
 ```
 
-若已经有兼容 PyTorch，不要让 `pip` 再安装一个不同 CUDA 构建覆盖它；先核对版本。
+### 3.4 一行检查
 
-## 4. 下载固定版本基座模型
+```powershell
+python scripts\check_environment.py `
+  --model models\qwen3-1.7b
+```
 
-训练脚本默认从下面的位置读取模型：
+检查内容：
+
+- Python 版本；
+- PyTorch/Transformers/PEFT/Accelerate/Safetensors/PyYAML；
+- CUDA 是否可用；
+- GPU 名称、总显存和 BF16；
+- 当前磁盘剩余空间；
+- Qwen3 模型目录必需文件；
+- Tokenizer 和 thinking/non-thinking Chat Template 是否可应用。
+
+模型下载前可以先不传 `--model`，只检查 GPU 和包；下载后必须再带模型路径运行一次。
+
+## 4. 下载 Qwen3-1.7B
+
+模型固定放在：
 
 ```text
 models/qwen3-1.7b/
 ```
 
-该目录在 `.gitignore` 中，模型权重不会进入 Git。
+该路径在 `.gitignore` 中，权重不会进入 Git。
 
-Hugging Face 方式：
+Hugging Face：
 
 ```bash
 python -m pip install huggingface_hub
@@ -150,20 +179,20 @@ hf download Qwen/Qwen3-1.7B ^
   --local-dir models/qwen3-1.7b
 ```
 
-Linux 将行尾的 `^` 改成 `\`。如果当前 `huggingface-cli` 版本不支持 `hf` 子命令，可使用：
+Linux 把 `^` 换成 `\`。如果安装的是旧 CLI：
 
 ```bash
 huggingface-cli download Qwen/Qwen3-1.7B --revision 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e --local-dir models/qwen3-1.7b
 ```
 
-ModelScope 方式：
+ModelScope：
 
 ```bash
 python -m pip install modelscope
 modelscope download --model Qwen/Qwen3-1.7B --local_dir models/qwen3-1.7b
 ```
 
-下载后至少应有：
+最低文件：
 
 ```text
 config.json
@@ -171,49 +200,106 @@ generation_config.json
 model.safetensors.index.json
 model-00001-of-00002.safetensors
 model-00002-of-00002.safetensors
-tokenizer.json
 tokenizer_config.json
+tokenizer.json
 vocab.json
 merges.txt
 ```
 
-本项目使用的 Qwen3-1.7B BF16 文件合计约 4.1 GB。不要拿 Qwen3-0.6B、GPTQ 版本或其他
-revision 的结果冒充相同复现。
+目录约 4.1 GB，不是 410 MB。下载中断后必须检查 `.safetensors` 文件和 index 是否完整。
 
-## 5. 先验证数据，不加载模型
+## 5. 选择与准备训练数据
 
-运行仓库级数据检查：
+### 5.1 先判断任务需要什么数据
 
-```bash
-python scripts/validate_datasets.py
+| 目标 | 应选数据 | 不应使用 |
+|---|---|---|
+| 角色聊天 | 多轮 user/assistant 对话 | 小说原文直接当聊天 |
+| 客服/业务问答 | 真实授权工单、FAQ、状态与操作边界 | 只含产品宣传文案 |
+| 分类/抽取 | 输入和标准输出对 | 只有无标签文章 |
+| 代码/工具调用 | 明确工具 schema 和成功轨迹 | 只凭自然语言描述工具 |
+| 继续预训练 | 大规模 raw text | 几百条聊天问答 |
+
+LoRA SFT 不是继续预训练。纯文本可以使用 `text` 字段做因果语言建模，但本仓库内置训练器
+面向对话 SFT，要求 system/user/assistant 结构。
+
+### 5.2 数据集来源优先级
+
+1. 自己拥有再分发和使用权的产品数据；
+2. 有明确许可证、贴近目标任务的公开数据集；
+3. 按规范生成并完成抽检与过滤的教师模型数据；
+4. 没有来源、自动洗稿、模板同质化或含真实隐私的抓取数据。
+
+使用公开数据集前检查：
+
+- dataset card 与仓库许可证；
+- 原始内容是否来自第三方 IP；
+- 数据是否含个人、医疗、金融或账号信息；
+- train/test 是否已划分，能否判断污染；
+- 对话角色是否一致；
+- 是否允许训练和再分发 Adapter。
+
+Hugging Face 和 ModelScope 的下载地址不能代替许可证审查。仓库提供的三个角色数据均为
+原创教师模型合成的虚构对话，只是可运行示例，不代表真实用户分布。
+
+可选数据集类型示例（只作为检索起点，使用前必须核对当前 dataset card、条款和下游限制）：
+
+| 类型 | 常见候选 | 适合先验证什么 | 主要风险 |
+|---|---|---|---|
+| 通用英文多轮对话 | `HuggingFaceH4/ultrachat_200k` | 对话格式、assistant-only SFT 流程 | 合成分布、语言不完全匹配 |
+| 中文日常多轮对话 | LCCC 系列 | 中文长短回复和日常聊天分布 | 数据较旧、版本与许可需核对 |
+| 中文自然对话 | NaturalConv | 中文自然轮次和话题变化 | 获取渠道及再分发条款需核对 |
+| 知识主题对话 | KdConv | 主题知识与多轮承接 | 偏电影/音乐/旅游，非通用陪伴 |
+| 大规模通用指令 | Infinity-Instruct 等 | 通用指令覆盖和大数据训练流程 | 体量大、来源混合，需严格过滤 |
+
+不要把所有候选直接拼成一个训练集。先分别抽样，统一角色名、system prompt、时间格式和
+输出长度，再计算跨集近似重复。真实产品数据与教师模型数据应记录不同来源标签，方便分析
+模型到底学到了哪一部分。
+
+### 5.3 推荐目录
+
+```text
+datasets/my-task/
+├── sft/
+│   ├── dataset_info.json
+│   ├── system_prompt.txt
+│   ├── train.jsonl
+│   ├── validation.jsonl
+│   └── test.jsonl
+└── source/
+    └── sessions.jsonl
 ```
 
-它会检查：
+`source/` 保存完整多轮会话，便于按会话切分；`sft/` 保存展开后的训练目标。
 
-- 所有必需 JSONL/JSON 文件存在；
-- 行数是否与冻结版本一致；
-- SFT 最后一条消息是否为非空 assistant；
-- 数据集 manifest 中的 SHA-256 是否与实际文件一致；
-- `dataset_info.json` 是否指向正确文件。
+### 5.4 SFT 样本
 
-最强的检查失败时不要继续训练。查看 `datasets/manifest.json` 可以定位文件差异。
+每行是一个 JSON：
 
-## 6. 数据结构与 split
+```json
+{
+  "id": "session-001:a01",
+  "session_id": "session-001",
+  "system_prompt": "你是[customer service]，先直接回答问题...",
+  "messages": [
+    {"role": "user", "content": "用户问题"},
+    {"role": "assistant", "content": "目标回答"}
+  ]
+}
+```
 
-### 6.1 source 和 SFT 的区别
+多轮样本可以包含多个 user/assistant 对，但最后一条必须是当前要预测的 assistant。
 
-`source/` 保存一段完整多轮对话。例如一段对话包含 4 个 user/assistant 回合。
+### 5.5 展开完整会话
 
-`sft/` 将这段对话展开成 4 个训练样本：
+一段 4 轮对话应展开为 4 条样本：
 
-1. 只给第 1 个 user，目标第 1 个 assistant；
-2. 给第 1 个 user、第 1 个 assistant、第 2 个 user，目标第 2 个 assistant；
-3. 给更长历史，目标第 3 个 assistant；
-4. 给完整历史，目标第 4 个 assistant。
+1. user1 → assistant1；
+2. user1/assistant1/user2 → assistant2；
+3. 前两轮历史 + user3 → assistant3；
+4. 前三轮历史 + user4 → assistant4。
 
-这样可以学习“在已有上下文下生成当前回复”，不是让模型一次背完整段对话。
-
-仓库中的冻结 SFT 可以直接训练。如果要把自己的多轮会话转换成相同格式，可运行：
+仓库提供通用展开器：
 
 ```powershell
 python scripts\build_sft.py `
@@ -222,7 +308,7 @@ python scripts\build_sft.py `
   --system-prompt path\to\system_prompt.txt
 ```
 
-JSON 输入也可以指定列表键：
+JSON 数组输入可指定：
 
 ```powershell
 python scripts\build_sft.py `
@@ -232,219 +318,296 @@ python scripts\build_sft.py `
   --system-prompt path\to\system_prompt.txt
 ```
 
-脚本要求每个会话以 user 开始、user/assistant 严格交替、以 assistant 结束；每遇到一个
-assistant 就生成一个目标，并保留会话 ID 等来源字段。它不会替你清洗内容或重新切分
-split，转换前仍要完成上一节的数据审查。
+脚本会验证角色交替和目标结构，但不会替你完成内容审查或 split。
 
-### 6.2 为什么必须按会话拆分
+### 5.6 切分规则
 
-同一段对话展开出来的多个目标高度相关。如果先把 4 个样本中的 3 个放进 train、1 个放进
-validation，验证集就泄漏了训练上下文，loss 会显得过于乐观。
+必须在展开 SFT 前按完整会话切分：
 
-因此仓库先按原始会话冻结 split，再分别展开 SFT。不要随机打乱所有 JSONL 行后重新切分。
+- train：训练参数；
+- validation/dev：训练期间选学习率、epoch 和检查点；
+- test：所有选择结束后只运行一次。
 
-封存测试集在检查点选择完成前不得查看。若看过测试结果后再调参，同批测试就不再是封存测试。
+禁止随机按单行切分，因为同一条会话展开出的样本含有大量重叠历史。禁止用 base 模型生成
+测试答案后再把相同输入放进训练集。
 
-### 6.3 训练提示与推理提示
+小数据集可使用大致 80/10/10 或 64/8/8 的会话划分，但要优先保证场景覆盖。测试集至少要有
+角色/任务、多轮承接、不知道、不应执行、自然结束等困难样本。
 
-每条 SFT 都保留自己的 `system_prompt`。训练和推理应尽量使用同一版本：
+### 5.7 数据清洗
 
-- 宋知意：`datasets/song-zhiyi/sft/system_prompt.txt`
-- 许澄：`weights/xu-cheng-epoch-1/system_prompt.txt`
-- 裴既明：`datasets/pei-jiming/sft/system_prompt.txt`
+必须检查：
 
-训练时写完整角色卡，部署时换成很短的核心提示，会改变条件分布。它可以作为一个实验，
-但不能把混合提示的结果归功于模型权重。
+- user/assistant 严格交替，最后一条是 assistant；
+- 空回答、重复回答、乱码、控制 Token；
+- system prompt 版本是否混杂；
+- 同一问题复制几十次；
+- 输出长度是否全是一种长度；
+- 用户问题是否被误写进 assistant 目标；
+- 角色名、身份、日期和事实是否冲突；
+- train/validation/test 是否存在近重复；
+- 是否含手机号、地址、账号、API Key、病历等敏感信息。
 
-## 7. assistant-only 标签规则
+数据量不是唯一标准。200 条覆盖广、无泄漏的数据通常比 2,000 条模板回复更值得训练。
 
-`scripts/train_lora.py` 使用以下算法：
+## 6. assistant-only 标签
 
-1. 把 system prompt 和最终 assistant 之前的所有消息套用 Qwen3 Chat Template；
-2. 追加当前 assistant 目标文本和 EOS；
-3. Tokenize 后先验证追加文本没有改变已有 Token 前缀；
-4. system、user、历史 assistant 的位置全部设为 `-100`；
-5. 仅最终 assistant 回答和 EOS 保留真实 Token ID；
-6. 超长时只移除最早的完整 user/assistant 历史对，绝不静默截断监督目标；
-7. 如果 system、最终 user 和目标本身仍超过最大长度，直接报错。
+对下面的对话：
 
-训练前运行 dry-run：
+```text
+System: 你是 X
+User: 今天很累
+Assistant: 那就先休息一下
+```
+
+如果整段都计算 loss，模型会学习：
+
+- 如何生成“你是 X”；
+- 如何生成用户问题；
+- 如何从上下文中复制文本。
+
+正确目标是让 labels 类似：
+
+```text
+System tokens       -100 -100 ...
+User tokens         -100 -100 ...
+Target tokens       “那就先休息一下” + EOS
+```
+
+本仓库 `train_lora.py` 的步骤：
+
+1. 渲染 system 和最终 assistant 之前的上下文，并加入 assistant generation prompt；
+2. 将目标回答和 EOS 接在后面；
+3. 分别 Tokenize 前缀和完整文本，检查前缀 Token 完全一致；
+4. 前缀 labels 全部设为 `-100`；
+5. 只保留目标回答和 EOS 的真实 Token ID；
+6. 超长时移除最早的完整 user/assistant 对；
+7. 如果 system、最终问题和目标本身仍超长，直接报错。
+
+先用 dry-run 检查：
 
 ```powershell
 python scripts\train_lora.py `
-  --config configs\song_zhiyi_qwen3_1_7b_lora.yaml `
+  --config configs\qwen3_1_7b_lora_template.yaml `
   --base-model models\qwen3-1.7b `
   --dry-run
 ```
 
-Linux 将反引号替换成 `\`。输出会给出：
+应在训练前改好模板中的数据名和路径，或直接对已有配置运行。
 
-- train/validation 行数；
-- 输入 Token 的 min/P50/P90/max；
-- 监督 Token 的 min/P50/P90/max；
-- 因超长移除的历史对数；
-- system prompt 和数据的 SHA-256；
-- 标签策略和样本权重设置。
+## 7. 参数怎么选
 
-常见错误：
+### 7.1 LoRA 参数
 
-- 用户消息也被监督：角色会学习生成用户的话；
-- 整个历史都被监督：模型会记忆上下文，而不是只学习当前回复；
-- 先截断再做 mask：可能最终目标全部变成 `-100`；
-- `DataCollatorForLanguageModeling` 覆盖自定义 labels；
-- 用字符串字符数替代 Token 数；
-- 目标和 EOS 没有一起监督，导致模型不会自然结束。
+下表是 8 GB 显存、1.7B 模型、小到中等数据集的起点，不是普遍最优值。
 
-## 8. 数据清洗与设计检查
+| 参数 | 建议起点 | 调整方法 |
+|---|---:|---|
+| `lora_rank` | 8 | rank 4 更轻；rank 16 只在明显欠拟合时比较 |
+| `lora_alpha` | 16 | 常从 1×–2× rank 开始；改动后重做对照 |
+| `lora_dropout` | 0.05 | 训练 loss 很低但验证变差时可试 0.1 |
+| target | q/k/v/o | 显存紧时 q/v；复杂领域再考虑加 MLP |
+| 可训练参数 | 0.03%–1% | 不是越少越省越好，要观察是否欠拟合 |
 
-本仓库的数据已经冻结，下面列出重新制作数据时必须检查的项目。
+LoRA 的缩放包含 alpha/rank。只提高 rank 而固定 alpha，会改变有效更新强度，因此 rank
+和 alpha 应成组记录和比较。
 
-### 8.1 格式和角色
+### 7.2 学习率
 
-- 每段对话从 user 开始，以 assistant 结束；
-- user/assistant 必须交替；
-- 删除空回复、重复 JSON 字段和损坏 Unicode；
-- 删除 `<|im_start|>`、`<|im_end|>` 等模板控制 Token 的原始文本；
-- system prompt 不能在每条对话中发生无记录漂移；
-- 每条样本的来源 ID、场景 ID 和 split 必须可追踪。
+先用保守值：
 
-### 8.2 内容质量
+| 训练目标数 | 起始学习率 |
+|---|---:|
+| < 500 | `1e-5` 或 `2e-5` |
+| 500–2,000 | `2e-5` 或 `5e-5` |
+| 2,000–10,000 | `5e-5` |
+| > 10,000 | `5e-5`–`1e-4` |
 
-- 角色名称、年龄、职业和关系不能前后矛盾；
-- 不能把用户的未知经历写成角色已知事实；
-- 同一会话可以有即兴细节，但必须前后一致；
-- 删除“作为 AI”“希望这些建议有帮助”等客服/助手腔；
-- 删除固定安慰模板和每轮反问；
-- 保留自然短句，避免所有回答都变成 80 字小作文；
-- 训练数据中的长度、动作和问句比例应符合部署目标。
+学习率过高常见表现：
 
-### 8.3 去重和泄漏
+- 回答快速变短；
+- 只会固定口头禅；
+- 复读用户问题；
+- 普通能力退化；
+- 输出不结束。
 
-- 同一个 assistant 目标不要机械复制到多个场景；
-- 计算规范化后的完全重复和近重复；
-- train、validation、test 间检查用户首句、场景和角色回复；
-- 同一 `session_id` 不得跨 split；
-- 测试集不能参与纠错、提示词选择或训练轮数选择。
+学习率过低常见表现：
 
-### 8.4 隐私和许可
+- 1–2 轮后风格变化很小；
+- train/validation loss 下降但仍像 Base；
+- 角色知识、格式或任务行为没有学会。
 
-- 不使用真实用户聊天，除非已获得明确授权并完成脱敏；
-- 不使用 API Key、手机号、地址、账号凭证等个人信息；
-- 第三方 IP 数据必须核对底层作品、数据集卡和衍生模型许可；
-- 数据审查通过不等于自动获得商业再分发权。
-
-## 9. 训练参数及选择理由
-
-仓库里的参数是为 1.7B、单角色、小到中等规模数据设计的起点，不是所有角色的统一最优值。
-
-### 9.1 许澄
+### 7.3 epoch 和优化步
 
 ```text
-LoRA rank        8
-LoRA alpha       16
-LoRA dropout     0.05
-Target modules   q/k/v/o/gate/up/down
-Epochs           2
-LR               5e-5
-Cutoff           1024
-Batch            1
-Accumulation     8
-Scheduler        cosine
-Warmup           0.05
+steps_per_epoch = ceil(训练样本数 / (batch × 梯度累积 × GPU 数))
+total_steps = steps_per_epoch × epoch
 ```
 
-理由：576 个训练目标比宋知意、裴既明更多，七个投影层可以观察单角色风格适配；每轮约
-72 个优化步。
+三个仓库例子的计划值：
 
-### 9.2 宋知意
+| 配置 | 训练目标 | batch × 累积 | 每轮步数 | 2 轮总步数 |
+|---|---:|---:|---:|---:|
+| 宋知意 | 276 | 1 × 8 | 35 | 70 |
+| 许澄 | 576 | 1 × 8 | 72 | 144 |
+| 裴既明 | 577 | 1 × 8 | 73 | 146 |
+
+建议策略：
+
+| 数据规模 | 第一轮比较 |
+|---|---|
+| < 500 目标 | 0.5、1、1.5 轮 |
+| 500–2,000 目标 | 1、1.5、2 轮 |
+| 2,000–10,000 目标 | 0.5、1、1.5 轮 |
+| > 10,000 目标 | 先 0.5、1 轮 |
+
+这里的“数据规模”是展开后的 assistant 目标数，不是原始对话段数。
+
+### 7.4 batch 和梯度累积
+
+8 GB 显存推荐：
 
 ```text
-LoRA rank        8
-LoRA alpha       16
-LoRA dropout     0.05
-Target modules   q/k/v/o/gate/up/down
-Epochs           2
-LR               2e-5
-Cutoff           1024
-Batch            1
-Accumulation     8
-Scheduler        cosine
-Warmup           0.05
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 8
 ```
 
-理由：只有 276 个训练目标，降低学习率以减缓快速模式坍塌；仍然保留半轮和整轮比较。
+有效 batch = micro batch × 梯度累积 × GPU 数。不要为了追求有效 batch 把 micro batch
+调大后 OOM。数据量少时可以保留 batch 1 和梯度累积 8，训练更慢但更稳。
 
-### 9.3 裴既明
+### 7.5 上下文长度
+
+`cutoff_len` 应按 Token 而不是字符设置：
+
+1. dry-run 查看输入 Token 的 P95/P99/max；
+2. 选 P95 或 P99；
+3. 留约 15%–25% 余量；
+4. 若少数超长样本包含关键信息，可单独增加长度或删减旧历史。
+
+本仓库 `cutoff_len` 是总预算，包含 system、历史、最终 user、目标 assistant 和 EOS。
+不要静默截掉监督目标。
+
+### 7.6 其他参数
 
 ```text
-LoRA rank        4
-LoRA alpha       8
-LoRA dropout     0.05
-Target modules   q/k/v/o
-Epochs           2
-LR               2e-5
-Cutoff           768
-Batch            1
-Accumulation     8
-Scheduler        cosine
-Warmup           0.04
-Long target      60+ Chinese chars: 3x sample weight
+learning_rate: 2e-5
+lr_scheduler_type: cosine
+warmup_ratio: 0.05
+weight_decay: 0.01
+max_grad_norm: 1.0
+bf16: true
+gradient_checkpointing: true
+seed: 42
 ```
 
-理由：第一轮 rank 8 + 七投影层实验出现快速长度收缩，因此最终配方减少可训练容量，
-并提高长目标权重。这个处理改善了一些开发集指标，但没有消除 LoRA 比 Base 更短的问题。
+- cosine：小到中等数据常用；
+- 5% warmup：降低最初更新不稳定风险；
+- max grad norm 1.0：抑制极端梯度；
+- BF16：A100/40 系等支持时优先；
+- gradient checkpointing：牺牲少量速度换取显存；
+- 固定 seed 只能提高可重复性，不能保证逐 bit 一致。
 
-### 9.4 选择逻辑
+## 8. 开始训练并监控
 
-- 先跑 Base + 正式提示，不把训练当作第一步；
-- 数据少于约 1,000 个目标时，优先比较 0.5、1、1.5、2 轮；
-- 不因 loss 继续下降就默认训练更久；
-- 不以同一角色的训练样本代替验证；
-- 检查点选择在 validation/development 上完成；
-- 最终只用一次封存 test。
+### 8.1 使用通用模板
 
-## 10. 开始训练
+```powershell
+Copy-Item `
+  configs\qwen3_1_7b_lora_template.yaml `
+  configs\my_task_qwen3_1_7b_lora.yaml
+```
 
-训练前删除或改名默认输出目录，脚本拒绝写入非空目录，避免覆盖旧结果。
+编辑以下字段：
 
-宋知意：
+```yaml
+model_name_or_path: models/qwen3-1.7b
+dataset_dir: datasets/my-task/sft
+dataset: my_task_train
+eval_dataset: my_task_validation
+output_dir: outputs/lora-qwen3-1.7b-my-task
+```
+
+`dataset_dir/dataset_info.json` 示例：
+
+```json
+{
+  "my_task_train": {
+    "file_name": "train.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  },
+  "my_task_validation": {
+    "file_name": "validation.jsonl",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "messages",
+      "system": "system_prompt"
+    },
+    "tags": {
+      "role_tag": "role",
+      "content_tag": "content",
+      "user_tag": "user",
+      "assistant_tag": "assistant"
+    }
+  }
+}
+```
+
+### 8.2 先 dry-run
 
 ```powershell
 python scripts\train_lora.py `
-  --config configs\song_zhiyi_qwen3_1_7b_lora.yaml `
-  --base-model models\qwen3-1.7b
+  --config configs\my_task_qwen3_1_7b_lora.yaml `
+  --base-model models\qwen3-1.7b `
+  --dry-run
 ```
 
-许澄：
+确认：
+
+- 行数正确；
+- 输入 Token 最大不超过 cutoff；
+- 每行 supervised tokens > 0；
+- train/validation 没有同一 session；
+- system prompt 只有一个预期版本。
+
+### 8.3 小规模 GPU smoke
 
 ```powershell
 python scripts\train_lora.py `
-  --config configs\xu_cheng_qwen3_1_7b_lora.yaml `
-  --base-model models\qwen3-1.7b
+  --config configs\my_task_qwen3_1_7b_lora.yaml `
+  --base-model models\qwen3-1.7b `
+  --output-dir outputs\smoke-my-task `
+  --max-train-samples 20
 ```
 
-裴既明：
+smoke 只验证模型、CUDA、loss、保存和验证逻辑，不能评价质量。它会读取完整验证集。
+
+### 8.4 正式训练
 
 ```powershell
 python scripts\train_lora.py `
-  --config configs\pei_jiming_qwen3_1_7b_lora.yaml `
+  --config configs\my_task_qwen3_1_7b_lora.yaml `
   --base-model models\qwen3-1.7b
 ```
 
-Linux 将反引号替换成 `\`。
-
-首次运行时 Transformers 需要加载约 4.1 GB BF16 权重。历史 8 GB 显卡实验的峰值已分配
-显存约 4.3–4.6 GiB，但不同 PyTorch/CUDA 版本可能更高。
-
-训练输出示意：
+输出：
 
 ```text
-outputs/lora-song-zhiyi-v2/
-├── training-audit-before.json
-├── training-audit.json
-├── tensorboard/
+outputs/lora-qwen3-1.7b-my-task/
 ├── adapter_config.json
 ├── adapter_model.safetensors
+├── training-audit-before.json
+├── training-audit.json
+├── training_args.bin
 └── checkpoints/
     ├── epoch-1-half/
     ├── epoch-1/
@@ -452,193 +615,220 @@ outputs/lora-song-zhiyi-v2/
     └── epoch-2/
 ```
 
-每个 milestone 只保存 Adapter，不保存完整优化器，因此可以比较模型效果，但不能从中断步
-Exactly resume optimizer 状态。
+每个 milestone 保存 Adapter，不保存 optimizer resume state。若要真正支持中断续训，应另开
+实验，把 optimizer/scheduler/RNG 一并 checkpoint，不能把当前 Adapter-only 目录当成完整
+resume state。
 
-## 11. 训练时看什么
-
-### 11.1 loss
-
-- loss 必须是有限值；
-- 前几十步通常波动，不需要因为单步反弹停止；
-- 验证 loss 快速接近 0 但回答越来越短，可能是记住高频短句式；
-- 验证 loss 下降但自由对话变差，应视为分布和评估目标不一致。
-
-### 11.2 显存
+### 8.5 监控什么
 
 ```powershell
 nvidia-smi -l 2
 ```
 
-若 8 GB 显卡 OOM：
+关注：
 
-1. 确认只训练 LoRA，冻结基座；
-2. 确认 `gradient_checkpointing: true`；
-3. 保持 batch 1，只降低 cutoff；
-4. 仍不够时减少 target modules 或 rank；
-5. 不要用“悄悄切换到其他基座”掩盖 OOM。
+- `train_loss` 和 `eval_loss` 是否有界；
+- 验证 loss 是否下降但输出变短；
+- 显存是否持续增长；
+- 每半轮固定问题的回答；
+- exact repeat、near repeat、空回答；
+- 任务成功率、格式成功率、角色/领域一致性；
+- 不知道、拒绝和安全边界是否退化。
 
-### 11.3 质量监控
+遇到 NaN/Inf 时停止。遇到 OOM 时先保持 batch 1 和 gradient checkpointing，再降低
+cutoff；若仍然 OOM，减少 target modules 或改用 QLoRA。
 
-每个半轮检查点都做 10–20 个固定聊天，观察：
+## 9. 如何选择 epoch 和最终检查点
 
-- 是否开始重复上一轮回答；
-- 是否只会回答几个字；
-- 是否忘记角色名或把用户身份说错；
-- 是否每轮反问；
-- 是否把动作写成固定模板；
-- 是否在不知道时编造；
-- 是否比同提示 Base 更自然、更连贯。
+不要用训练样本或验证 loss 单独选择最终模型。推荐流程：
 
-出现稳定复读、身份混乱、极短回答或边界恶化时，先停止增加 epoch，不要用降低 loss 解释。
+1. Base 使用正式 system prompt 回答固定开发题；
+2. 0.5/1/1.5/2 轮使用完全相同的 prompt、历史、seed 和采样参数回答；
+3. 自动检查重复、长度、空回答、格式、关键词和硬失败；
+4. 对回答来源做匿名 A/B；
+5. 按预定义的硬门槛淘汰；
+6. 在剩余候选中按自然度和任务质量选择；
+7. 选定后只在封存 test 上运行一次。
 
-## 12. 检查点选择
+硬门槛可以包括：
 
-同一角色的 Base 与所有检查点必须使用：
+- 不泄露系统提示或用户隐私；
+- 不将用户问题当成角色回答；
+- 不编造工具结果、知识来源或现实行动；
+- 重复率不高于 Base；
+- 平均长度不出现灾难性坍缩；
+- 用户明确结束时能够停止。
 
-- 同一基座 revision；
-- 同一 system prompt；
-- 同一聊天历史；
-- 同一生成参数；
-- 同一最大输出长度；
-- 同一评估问题。
+同一任务建议至少评价：
 
-先抽查开发集，再计算自动诊断：
-
-- 完全重复回答；
-- 相邻回答近似复读；
-- 过短回答；
-- 平均/中位字符数；
-- 角色称谓和身份混乱；
-- 事实冲突；
+- 任务正确性；
+- 指令遵循；
+- 上下文承接；
+- 格式稳定；
+- 自然度/可读性；
+- 长度适配；
+- 重复；
+- 事实/能力边界；
 - 安全边界；
-- 多轮上下文承接；
-- 人工 A/B 偏好。
+- 通用能力保持。
 
-验证 loss 只用于发现训练异常，不能单独决定“哪个模型更像角色”。
-
-## 13. 固定问题的 Base/LoRA 对照
-
-运行：
+## 10. 固定问题评测
 
 ```powershell
 python scripts\evaluate_checkpoints.py `
   --base-model models\qwen3-1.7b `
-  --adapter-root outputs\lora-song-zhiyi-v2 `
-  --system-prompt datasets\song-zhiyi\sft\system_prompt.txt `
-  --output-dir outputs\song-zhiyi-evaluation
+  --adapter-root outputs\lora-qwen3-1.7b-my-task `
+  --system-prompt datasets\my-task\sft\system_prompt.txt `
+  --output-dir outputs\my-task-evaluation `
+  --max-new-tokens 192 `
+  --input-budget 8192
 ```
 
-脚本会识别两类目录：
+脚本会识别：
 
 ```text
 checkpoint-*
 checkpoints/epoch-*
 ```
 
-如角色需要称谓统计，可重复传入：
+生成：
 
-```powershell
-python scripts\evaluate_checkpoints.py ... --role-marker 宋知意
-```
+- `results.jsonl`：每次回答、Token、延迟和自动诊断；
+- `summary.json`：各模型汇总；
+- `report.md`：表格和原始回答。
 
-输出：
+内置问题只是通用烟测。正式任务应换成自己的固定开发集，并为格式、事实、拒答、工具调用或
+其他硬约束增加程序检查。
 
-- `results.jsonl`：每个问题的原始回答、Token、延迟和自动诊断；
-- `summary.json`：各检查点的机器可读汇总；
-- `report.md`：便于人工查看的表格和回答原文。
+## 11. 加载 Adapter 和 Base 对照
 
-自动指标不能识别所有语义错误。最终仍需要人工或独立裁判，最好对模型来源匿名。
-
-## 14. 使用已经发布的 Adapter
-
-Base 对照组：
+Base：
 
 ```powershell
 python scripts\chat_checkpoint.py `
   --base-model models\qwen3-1.7b `
-  --system-prompt weights\song-zhiyi-epoch-2-half\system_prompt.txt `
+  --system-prompt datasets\my-task\sft\system_prompt.txt `
   --max-new-tokens 256
 ```
 
-LoRA 组：
+LoRA：
 
 ```powershell
 python scripts\chat_checkpoint.py `
   --base-model models\qwen3-1.7b `
-  --adapter weights\song-zhiyi-epoch-2-half `
-  --system-prompt weights\song-zhiyi-epoch-2-half\system_prompt.txt `
+  --adapter outputs\lora-qwen3-1.7b-my-task\checkpoints\epoch-1 `
+  --system-prompt datasets\my-task\sft\system_prompt.txt `
   --max-new-tokens 256
 ```
 
-其他角色替换 Adapter 和提示词目录：
+固定对照时：
 
-```text
-weights/xu-cheng-epoch-1/
-weights/pei-jiming-epoch-1/
-```
+- 重启进程或 `/reset`；
+- 使用同一基座 revision；
+- system prompt 完全一致；
+- 历史一致；
+- temperature/top-p/top-k/repetition penalty 一致；
+- thinking 设置一致。
 
-固定比较时，每次输入 `/reset` 清空历史。不要把 LoRA 的历史继续喂给 Base，或反过来。
+Qwen3 官方模型卡建议 non-thinking 对话从 `temperature=0.7, top_p=0.8, top_k=20` 测试；
+thinking 模式使用另一组参数。不要用 greedy decoding 证明模型复读，也不要为两个模型用
+不同采样参数。
 
-## 15. 常见故障
+## 12. 与 LLaMA-Factory、TRL 的关系
 
-### `CUDA is required`
+本仓库的正式训练入口是 `train_lora.py`，因为 assistant-only mask 和检查点行为可以逐行检查。
 
-当前 PyTorch 是 CPU 构建，或 NVIDIA 驱动/CUDA 不可用。重新安装匹配机器的 CUDA wheel。
+如果更熟悉成熟框架：
 
-### CUDA OOM
+- LLaMA-Factory 适合 QLoRA、多 GPU、可视化和大规模配置；
+- `configs/*.yaml` 和 `dataset_info.json` 保留了兼容的 ShareGPT 字段；
+- 但不同版本对 `mask_history`、历史 assistant loss、thinking 和保存策略的语义可能变化；
+- 使用前必须按本节 dry-run 方法检查实际 labels，不能只因为“配置写了 mask_history”就默认正确；
+- TRL 的 `SFTTrainer` 支持 conversational dataset 和 `assistant_only_loss=True`；
+- 使用 TRL/LLaMA-Factory 会产生不同依赖和训练实现，不能与当前结果混为一组消融。
 
-确认没有旧 Python 进程占用显存：
+建议把框架版本、commit、完整 YAML、`dataset_info.json`、Token 统计和模板写入实验记录。
+
+## 13. 常见故障
+
+### `KeyError: 'qwen3'`
+
+Transformers 太旧。使用支持 Qwen3 的版本，不要用 4.50 以下版本。
+
+### CUDA 不可用
+
+检查是否安装了 CPU PyTorch：
 
 ```powershell
-nvidia-smi
+python scripts\check_environment.py
 ```
 
-关闭占用进程后重试。不要在没有记录的情况下改 cutoff 或 LoRA target；这会产生不同实验。
+不要设置 `CUDA_VISIBLE_DEVICES=-1` 后声称完成 GPU 复现。
 
-### `Adapter was trained for ...`
+### CUDA out of memory
 
-Adapter 与基座模型不一致。使用 `Qwen/Qwen3-1.7B` 固定 revision，而不是 0.6B、4B 或另一个
-量化基座。
+顺序处理：
 
-### 找不到 `adapter_model.safetensors`
+1. 关闭其他占显存进程；
+2. 确认 batch 1；
+3. 确认 gradient checkpointing；
+4. 降低 cutoff；
+5. 减少 target modules；
+6. 使用 QLoRA 并另写实验记录。
 
-确认路径指向 Adapter 目录本身，不是仓库根目录；PEFT 需要
-`adapter_config.json` 和权重文件同时存在。
+### loss 下降但回答更差
 
-### 回答为空或不停重复
+这是正常可能。检查：
 
-先检查：
+- 目标长度是否过度集中；
+- 是否所有回答都使用同一模板；
+- 学习率是否过高；
+- epoch 是否过多；
+- 是否只比较了训练 loss；
+- 推理 prompt 是否和训练不同；
+- decoder 参数是否导致复读。
 
-- 训练和推理提示是否一致；
-- 检查点是否过晚；
-- 训练目标是否过短；
-- 历史中是否已经包含模型生成的重复错误；
-- `max_new_tokens`、temperature 和 repetition penalty 是否一致。
+### 验证 loss 很低但测试很差
 
-复读通常是数据分布、检查点和上下文的共同问题，不是简单加一句“不要重复”就能修复。
+可能发生了会话泄漏、近重复污染、测试题已经用于调参，或验证和测试分布不同。重新检查
+会话 ID 与数据哈希，不要继续使用已污染的测试集证明效果。
 
-### Windows `KMP_DUPLICATE_LIB_OK`
+### Adapter 加载报基座不匹配
 
-这是危险提示，表示同一进程加载了多份 OpenMP runtime。优先修复环境冲突。不得把
-`KMP_DUPLICATE_LIB_OK=TRUE` 当成默认解决方案；它可能隐藏崩溃或给出错误结果。
+确认 Adapter 与 `Qwen/Qwen3-1.7B` 相同 revision，且不是由 Qwen3-1.7B-Base、GPTQ 或
+合并模型创建。`adapter_config.json` 只能记录原本训练的基座路径，不能修复结构或权重差异。
 
-### 本地 API Key 无法使用
+### 训练和推理回答风格不同
 
-本仓库训练和推理直接加载本地权重，不需要 DeepSeek、OpenCode 或 Qwen API Key。本地假
-Key、`.env` 和 App 配置不会影响训练。真正的模型下载认证只由 Hugging Face/ModelScope
-工具处理。
+检查：
 
-## 16. 复现结论的边界
+- system prompt 是否同一版本；
+- 是否一个用 thinking、一个用 non-thinking；
+- Qwen3 Chat Template 是否一致；
+- 历史是否加了训练时没有的字段；
+- 推理采样参数是否和评测一致。
 
-- 训练成功只证明流程可执行；
-- loss 下降不证明角色质量提高；
-- 单张截图不是统计评测；
-- 单一 LLM 裁判不是人工盲评；
-- 276–577 个训练目标不能代表真实用户分布；
-- 1.7B 单角色 Adapter 不能替代角色卡、上下文管理、长期记忆和安全策略；
-- 已发布 Adapter 是作者偏好的实验候选，不是生产安全认证；
-- 看过 test 后继续调参，就不能再把同一 test 称为封存测试。
+## 14. 仓库内三个案例的数据来源
 
-如果这些限制得到如实报告，本仓库就完成了它要证明的事情：从数据、标签、训练、选点、
-推理到错误分析，整条单角色 LoRA 流程可以被检查，也可以在其他人的机器上重新执行。
+这一节只是通用流程的实际应用，不是训练模板的一部分。
+
+| 数据集 | 角色来源 | 对话生成来源 | 可复现内容 |
+|---|---|---|---|
+| 许澄 | 项目原创 Character Bible | 网页 GPT 系列；60 个会话记录 `GPT-6`，70 个早期会话 `unknown` | 数据、训练配置、Adapter、评测 |
+| 宋知意 | 项目原创角色卡 | OpenCode `deepseek-v4.1-flash` | 数据、训练配置、Adapter、评测 |
+| 裴既明 | 项目原创角色圣经 | OpenCode `deepseek-v4.1-flash` | 数据、训练配置、Adapter、评测 |
+
+三者均不含真实用户聊天。第三方角色实验的数据和权重受上游许可限制，不随仓库发布。
+
+## 15. 参考依据
+
+- [Qwen3-1.7B 模型卡](https://huggingface.co/Qwen/Qwen3-1.7B)
+- [Qwen3 官方仓库](https://github.com/QwenLM/Qwen3)
+- [Hugging Face PEFT](https://github.com/huggingface/peft)
+- [LoRA 论文](https://arxiv.org/abs/2106.09685)
+- [QLoRA 论文](https://arxiv.org/abs/2305.14314)
+- [TRL SFTTrainer](https://huggingface.co/docs/trl/main/en/sft_trainer)
+- [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory)
+- [LLaMA-Factory 数据格式](https://github.com/hiyouga/LLaMA-Factory/blob/main/data/README_zh.md)
+
+更细的“采用了什么、没有采用什么”见 [`docs/REFERENCES.md`](REFERENCES.md)。

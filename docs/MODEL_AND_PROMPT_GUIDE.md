@@ -1,5 +1,8 @@
 # Qwen3-1.7B 微调与角色提示指南
 
+通用环境安装、数据选择、LoRA 参数、epoch 选择和训练监控请先看
+[`REPRODUCTION.md`](REPRODUCTION.md)。本文只补充角色聊天场景中的数据和提示词设计。
+
 ## Qwen3-1.7B 是否适合
 
 适合：
