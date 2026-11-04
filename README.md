@@ -20,7 +20,7 @@ Qwen3-1.7B 单角色对话 LoRA 的可复现实验仓库。
 | RoleBench 孙悟空 | 1,260 训练 / 146 验证 | 2 轮，316 步 | Base + 角色卡更自然；LoRA 过度简短 |
 | 许澄 | 80 段训练 / 20 段验证；576 / 142 个回复目标 | 2 轮，144 步 | 作者偏好第 1 轮 + 核心提示 |
 | 宋知意 | 64 / 8 / 8 段；276 / 35 / 35 个回复目标 | 2 轮，70 步 | 作者偏好第 1.5 轮 + 精简训练提示 |
-| 甄嬛 | 3,729 条单角色问答 | 3 轮，702 步 | 第 1 轮附近最稳；后两轮出现短句复读 |
+| 甄嬛 | 3,729 条单轮剧情问答 | 3 轮，702 步 | **No-Go**：持续聊天退化、短句复读；仅保留失败分析 |
 | 凉宫春日 | 1,009 训练 / 115 验证 | 2 轮，254 步 | 作者偏好第 1.5 轮 + 角色卡；质量门禁 No-Go |
 
 五个实验共同表明：**LoRA 可以快速学习角色称谓和语气，但数据分布、提示词和选模方式
@@ -40,14 +40,14 @@ src/           Qwen3 + PEFT 的小型推理库
 docs/          实验记录、失败分析和提示词指南
 weights/       两个原创角色作者偏好的 LoRA Adapter 和对应提示词
 data/          Chat-Huanhuan、ChatHaruhi 第三方数据与许可说明
+screenshots/   作者实际对话中的 Base/LoRA 对照截图
 ```
 
 主要文档：
 
 - [五组 LoRA 实验复盘](docs/FINETUNING_CASE_STUDY.md)
 - [Qwen3-1.7B 微调与角色提示指南](docs/MODEL_AND_PROMPT_GUIDE.md)
-- [甄嬛实验记录](docs/EXPERIMENT.md)
-- [Chat-Huanhuan 复现边界](experiments/huanhuan/README.md)
+- [甄嬛失败复盘（反面教材）](experiments/huanhuan/README.md)
 - [ChatHaruhi 复现边界与结果](experiments/haruhi/README.md)
 - [公开 Adapter 与本地 Base/LoRA 对照](weights/README.md)
 - [同一提示词下的对照步骤](docs/LOCAL_COMPARISON.md)
@@ -119,7 +119,6 @@ models/qwen3-1.7b/
 
 - [`configs/xu_cheng_qwen3_1_7b_lora.yaml`](configs/xu_cheng_qwen3_1_7b_lora.yaml)
 - [`configs/song_zhiyi_qwen3_1_7b_lora.yaml`](configs/song_zhiyi_qwen3_1_7b_lora.yaml)
-- [`configs/huanhuan_qwen3_1_7b_lora.yaml`](configs/huanhuan_qwen3_1_7b_lora.yaml)
 - [`configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml`](configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml)
 
 ## 训练
@@ -136,15 +135,9 @@ llamafactory-cli train configs/xu_cheng_qwen3_1_7b_lora.yaml
 llamafactory-cli train configs/song_zhiyi_qwen3_1_7b_lora.yaml
 ```
 
-甄嬛需要先自行获取第三方数据：
-
-```bash
-python scripts/prepare_huanhuan_author_close.py \
-  --source data/source/huanhuan.json \
-  --output-dir data/prepared/huanhuan-author-close-v1
-
-llamafactory-cli train configs/huanhuan_qwen3_1_7b_lora.yaml
-```
+甄嬛实验已判定为 No-Go。为避免他人重复使用错误的数据与训练配方，仓库不提供
+训练配置、数据准备脚本或 Adapter，只保留
+[`experiments/huanhuan/README.md`](experiments/huanhuan/README.md) 中的失败分析。
 
 凉宫春日实验使用 ChatHaruhi 54K 聚合数据中固定版本的凉宫春日子集。数据不随仓库分发，
 准备方式和许可边界见 [`experiments/haruhi/README.md`](experiments/haruhi/README.md)。
@@ -278,11 +271,29 @@ Base + 最终提示词
 - 许澄、宋知意数据是原创虚构角色的教师模型合成内容；
 - 仓库包含许澄、宋知意两个原创角色的 LoRA Adapter，不包含 Qwen3 基座权重、
   合并模型、量化模型、API Key 或真实用户聊天记录；
-- Chat-Huanhuan 数据源自影视剧本，第三方数据和权重未上传；
+- Chat-Huanhuan 数据源自影视剧本，实验已判定为 No-Go；第三方数据、训练配置、
+  脚本和权重均不提供；
 - ChatHaruhi 聚合数据卡与上游说明存在 CC-BY-4.0、CC-BY-NC-4.0 声明冲突，第三方数据、
   Adapter 和权重均未上传；
 - MIT 只适用于本仓库原创代码，不代表第三方数据、基座模型或衍生模型获得相同授权；
 - 使用第三方数据前请阅读 [`data/README.md`](data/README.md)。
+
+## 对话截图
+
+这里保存作者实际使用相同角色提示、但分别加载 Base 与 LoRA 的终端对话截图。
+截图是单次体验证据，不是统计显著性或人工盲评。
+
+![全部 Base/LoRA 截图总览](screenshots/all-comparisons.jpg)
+
+| 角色 | Base | LoRA |
+|---|---|---|
+| 孙悟空 | [base.png](screenshots/wukong/base.png) | [lora.png](screenshots/wukong/lora.png) |
+| 许澄 | [base.png](screenshots/xu-cheng/base.png) | [lora.png](screenshots/xu-cheng/lora.png) |
+| 宋知意 | [base.png](screenshots/song-zhiyi/base.png) | [lora.png](screenshots/song-zhiyi/lora.png) |
+| 凉宫春日 | [base.png](screenshots/haruhi/base.png) | [lora.png](screenshots/haruhi/lora.png) |
+
+更详细的截图环境和限制见
+[`screenshots/README.md`](screenshots/README.md)。
 
 ## 验证
 

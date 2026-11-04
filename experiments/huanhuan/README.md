@@ -1,67 +1,51 @@
-# Chat-Huanhuan experiment
+# 甄嬛 Chat-Huanhuan：No-Go 反面案例
 
-该实验用于验证：
+该实验已完成训练，但结果不适合作为可发布角色模型。仓库不再提供训练配置、
+数据处理脚本、Adapter 或权重，只保留失败分析和来源边界。
 
-- Qwen3-1.7B 能否在 RTX 4060 8 GB 上完成 LoRA；
-- 短单轮角色问答经过不同训练轮数后会怎样变化；
-- 简短、核心和完整角色提示对复读与回答长度的影响。
+## 数据实际形态
 
-## Data boundary
+上游数据为 3,729 条近似单行问答：
 
-训练数据来自第三方 Chat-Huanhuan 项目，源头包含影视剧本对白。本仓库不复制原始数据、
-衍生训练文件或 Adapter 权重。获取方式见 [`../../data/README.md`](../../data/README.md)。
-
-## Fixed experiment
-
-| 项目 | 值 |
-|---|---:|
-| Samples | 3,729 |
-| Duplicate rows | 112, intentionally retained |
-| Model | Qwen3-1.7B |
-| LoRA | r8 / alpha32 / dropout0.1 |
-| Target modules | q/k/v/o/gate/up/down |
-| Cutoff | 384 |
-| Micro batch | 1 |
-| Gradient accumulation | 16 |
-| Learning rate | `1e-4` |
-| Epochs | 3 |
-| Optimizer steps | 702 |
-| Hardware | RTX 4060 Laptop, 8 GB |
-| Training time | 1h53m36s |
-| Final average training loss | about 2.98 |
-
-No validation split was used because the upstream project does not provide one. This is a
-reproduction limitation, not a claim that the selected checkpoint was statistically validated.
-
-## Prompt comparison
-
-| Prompt | Size | Best observed region | Main tradeoff |
-|---|---:|---|---|
-| Brief | 7 Token | half epoch | stable but very short |
-| Core | 73 Token | epoch 1 | better balance and continuity |
-| Character card | 298 Token | epoch 1 | stronger identity, shorter replies |
-
-Across the 12 independent prompts and 8-turn conversation:
-
-- half epoch under brief prompt had low repetition but repetitious “愿意陪皇上说会儿话” later;
-- epoch 1 under core/card prompts was the best balance;
-- epoch 2 and final increased exact or near repetition in several runs;
-- a longer role card improved identity coverage but did not prevent brevity.
-
-## Reproduction
-
-1. Obtain `huanhuan.json` from the upstream project.
-2. Run `scripts/prepare_huanhuan_author_close.py`.
-3. Run `llamafactory-cli train configs/huanhuan_qwen3_1_7b_lora.yaml`.
-4. Evaluate checkpoints:
-
-```bash
-python scripts/evaluate_checkpoints.py \
-  --base-model models/qwen3-1.7b \
-  --adapter-root outputs/huanhuan-qwen3-lora-v1 \
-  --system-prompt prompts/character_card_zh.txt \
-  --output-dir outputs/huanhuan-evaluation
+```text
+System: 现在你要扮演皇帝身边的女人--甄嬛
+User:   其他剧情角色的一句话
+Assistant: 甄嬛的一句回答
 ```
 
-The aggregate interpretation is included in
-[`../../docs/FINETUNING_CASE_STUDY.md`](../../docs/FINETUNING_CASE_STUDY.md).
+数据特点：
+
+- 单轮短问答为主，每条回答字符中位数约 20；
+- 同一问题类型和高频宫廷用语重复较多；
+- 用户角色并不固定为皇上；
+- 没有独立验证集或封存测试集；
+- 没有稳定、统一的多轮关系状态。
+
+仓库不包含原始数据、衍生数据或 Adapter，来源与许可边界见
+[`../../data/README.md`](../../data/README.md)。
+
+## 为什么最终放弃
+
+训练本身可以完成，约 3,729 条、3 轮、702 个优化步。问题出现在聊天质量：
+
+- 使用完整角色卡后，回答经常退化为一句或几个词；
+- 多轮对话中反复出现固定宫廷措辞；
+- 角色关系、用户身份和上下文承接不稳定；
+- 部分回答像在继续复述训练集中的单句剧情，而不是进行持续聊天；
+- 仅靠更换 `brief`、`core` 或 `card` 无法解决训练分布问题。
+
+核心原因是训练和部署目标不一致：
+
+1. 训练学习的是“看见一句剧情对白，用短句回答”；
+2. 产品要求的是“在固定角色卡、长期关系和上下文下持续聊天”；
+3. 数据中没有稳定的用户身份、多轮修复和自然结束样本；
+4. 原有单行 System Prompt 与后来编写的角色卡差异过大；
+5. loss 下降只说明模型学会了近似问答分布，不说明角色聊天质量提升。
+
+## 结论
+
+- 不推荐加载任何现有甄嬛 Adapter；
+- 不从旧权重继续增加 epoch；
+- 若要重做，必须重新构造固定用户关系、4–6 轮对话、冲突修复和边界样本，
+  并让训练与推理使用同一个角色提示；
+- 旧训练仅作为“短期风格适配不等于角色陪伴能力”的失败证据。

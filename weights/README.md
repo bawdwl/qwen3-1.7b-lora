@@ -22,8 +22,8 @@ and supply it with `--base-model`.
 
 The repository intentionally excludes:
 
-- Chat-Huanhuan / 甄嬛 adapters because the underlying drama text has unclear
-  redistribution rights;
+- Chat-Huanhuan / 甄嬛 adapters because the experiment failed continuous-chat
+  quality and the underlying drama text has unclear redistribution rights;
 - ChatHaruhi / 凉宫春日 adapters because the upstream license statements
   conflict and the franchise has separate rights;
 - RoleBench 孙悟空 adapters because the generated-answer dataset's derivative

@@ -7,7 +7,7 @@
 - `datasets/xu-cheng/`
 - `datasets/song-zhiyi/`
 
-参考实验使用 Chat-Huanhuan 项目公开的 `huanhuan.json`：
+早期 Chat-Huanhuan 实验曾使用项目公开的 `huanhuan.json`：
 
 - 来源：<https://github.com/KMnO4-zx/huanhuan-chat>
 - 训练文件：`dataset/train/lora/huanhuan.json`
@@ -16,6 +16,10 @@
 
 上游说明包含“仅供学习和研究”与“不得商用”等使用边界。项目中某个衍生模型卡使用了
 不同的许可证声明，不能因此忽略底层剧本和角色素材涉及的第三方权利。
+
+该实验现已判定为 **No-Go**：数据以单轮短问答为主，用户身份不固定，没有验证集，
+持续聊天会明显退化为短句复读。仓库不提供训练配置、数据准备脚本或 Adapter；
+失败原因见 [`experiments/huanhuan/README.md`](../experiments/huanhuan/README.md)。
 
 使用前请自行复核：
 
