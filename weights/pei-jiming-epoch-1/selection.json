@@ -1,0 +1,41 @@
+{
+  "schema_version": "pei-jiming-selected-adapter-v1",
+  "selected_from": "outputs/lora-pei-jiming-v2-attn/checkpoints/epoch-1",
+  "base_model": "Qwen/Qwen3-1.7B",
+  "lora": {
+    "rank": 4,
+    "alpha": 8,
+    "target_modules": [
+      "q_proj",
+      "k_proj",
+      "v_proj",
+      "o_proj"
+    ]
+  },
+  "training": {
+    "epochs": 2,
+    "optimizer_steps": 146,
+    "learning_rate": 0.00002,
+    "long_target_weight": 3.0,
+    "long_target_char_threshold": 60
+  },
+  "development_judgement": {
+    "lora_overall": 2.154,
+    "base_overall": 1.615,
+    "lora_hard_failures": 0,
+    "base_hard_failures": 1
+  },
+  "sealed_test": {
+    "lora_overall": 1.545,
+    "base_overall": 1.182,
+    "lora_wins": 6,
+    "base_wins": 5,
+    "lora_hard_failures": 1,
+    "base_hard_failures": 2,
+    "lora_mean_reply_chars": 40.2,
+    "base_mean_reply_chars": 58.4
+  },
+  "adapter_model_sha256": "82A3AE025EBB27ED224A1042375B59355E8A945CDF6D2A5BC5F4EDF777A560CE",
+  "status": "selected_with_known_length_regression",
+  "training_outputs_are_not_deleted": true
+}

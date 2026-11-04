@@ -1,9 +1,7 @@
-# Verified in the local RTX 4060 experiment.
-torch==2.7.1
-transformers==5.6.0
-peft==0.18.1
-accelerate>=1.0
-datasets>=3.0
-llamafactory==0.9.5
-safetensors>=0.4
-matplotlib>=3.8
+# Versions used for the 2026 Qwen3-1.7B training runs.
+torch==2.13.0
+transformers==5.20.2
+peft==0.21.2
+accelerate==1.15.0
+PyYAML==6.0.3
+safetensors==0.8.0

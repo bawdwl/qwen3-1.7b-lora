@@ -1,11 +1,17 @@
 {
-  "schema_version": "shiyu-original-character-datasets-v1",
+  "schema_version": "shiyu-original-character-datasets-v2",
   "provenance": {
     "type": "synthetic_teacher_model_dialogues",
     "contains_real_user_chats": false,
     "contains_model_weights": false
   },
   "xu_cheng": {
+    "teacher_model": "web GPT family",
+    "teacher_model_records": {
+      "GPT-6": 60,
+      "unknown": 70
+    },
+    "teacher_version": "unknown",
     "source_sessions": {
       "train": 80,
       "validation": 20,
@@ -39,6 +45,8 @@
     }
   },
   "song_zhiyi": {
+    "teacher_provider": "opencode",
+    "teacher_model": "deepseek-v4.1-flash",
     "source_dialogues": 80,
     "assistant_targets": {
       "train": 276,
@@ -48,23 +56,76 @@
     "files": {
       "datasets/song-zhiyi/sft/train.jsonl": {
         "rows": 276,
-        "sha256": "8b43411dd6b3a8bef5b70888ab239ce6e92c29b56e04f3346a1e73b48d4d9fa6"
+        "sha256": "0de4ef284d2ff7d62d09873e52426694c5867559d7e736db1358e886eb4822c2"
       },
       "datasets/song-zhiyi/sft/validation.jsonl": {
         "rows": 35,
-        "sha256": "58d9543481d0d6f96791ae97e59d9b30c9c6adb4b7fe736dabacde1ebbbd2e4d"
+        "sha256": "9304a79f314622f33e529e3592eeed9c4763170af8a166a5d7113efbf1dc5d45"
       },
       "datasets/song-zhiyi/sft/test.jsonl": {
         "rows": 35,
-        "sha256": "bb6949c0925e98dfd27290c5cdbbcf3e7ca8fd29c2a8ff22561f45ede0710340"
+        "sha256": "08343120b509eaf72c24cfcc3c1ed56dfb6e70af500b5c2cc90e462a19aaa193"
       },
       "datasets/song-zhiyi/source/scenarios.json": {
         "rows": 80,
-        "sha256": "a09abf6e47100d749ada991e697fa79f82a9d77c932236676396ab17be259743"
+        "sha256": "90752ab90475c508d648d0ecacb23b5ce2c0b9d5d6f865ba0666e3417fca66a7"
       },
       "datasets/song-zhiyi/source/dialogues.json": {
         "rows": 80,
-        "sha256": "39833e5d6d02f73a06399d461d61748533c41b8f7295d078b58c0a7e61760a2e"
+        "sha256": "3c1fd829b0ebea12d9512107ceb5aafd6a285832a175128a83477e4bcbf5e109"
+      }
+    }
+  },
+  "pei_jiming": {
+    "role_origin": "original_fictional_character",
+    "generation": "teacher_model_synthetic_dialogues",
+    "teacher_provider": "opencode",
+    "teacher_model": "deepseek-v4.1-flash",
+    "contains_real_user_chats": false,
+    "splits": {
+      "scenarios": {
+        "train": 96,
+        "validation": 13,
+        "test": 11
+      },
+      "source_branches": {
+        "train": 156,
+        "validation": 13,
+        "test": 11
+      },
+      "assistant_targets": {
+        "train": 577,
+        "validation": 54,
+        "test": 45
+      }
+    },
+    "files": {
+      "datasets/pei-jiming/source/scenarios.json": {
+        "rows": 120,
+        "sha256": "c64a33b7119acb4a0864f43cd0a8406a21696ecf798d17e232565a0edc73e7ec"
+      },
+      "datasets/pei-jiming/source/dialogues.json": {
+        "rows": 120,
+        "sha256": "2c46e26f76f850e7806f80adb6971025e796bfe77bbbff45310e3561080104b5"
+      },
+      "datasets/pei-jiming/source/long_reply_supplement.json": {
+        "rows": 60,
+        "sha256": "bfde060126dc0a34e7264a3dfdb808cefd297d24f8b2818f7f7fc5c42b60bd44"
+      },
+      "datasets/pei-jiming/source/dataset_audit.json": {
+        "sha256": "32986df5fd97f78d658224604c0acb5f50c869128f18ecda9e995c5f40279d3f"
+      },
+      "datasets/pei-jiming/sft/train.jsonl": {
+        "rows": 577,
+        "sha256": "bdc404eb04d9b744a744a8caf14b52467b4e88683a700d3ceb1852b4a61c3f0c"
+      },
+      "datasets/pei-jiming/sft/validation.jsonl": {
+        "rows": 54,
+        "sha256": "f75c782e525d7e05451ebe093c35d99d612695c660f180133fc0436466a0c837"
+      },
+      "datasets/pei-jiming/sft/test.jsonl": {
+        "rows": 45,
+        "sha256": "60b12d45a8f5249e73608ff18b1707d559a08b71b7ed26df94e79b0720799b3e"
       }
     }
   }

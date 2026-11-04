@@ -4,16 +4,13 @@
 
 ## 包含内容
 
-| 数据集 | 原始对话 | SFT 目标 | 说明 |
-|---|---:|---:|---|
-| [许澄](xu-cheng/README.md) | 100 段校准 + 30 段隔离测试 | 576 训练 / 142 验证 | 夜班图书管理员，原创温柔陪伴角色 |
-| [宋知意](song-zhiyi/README.md) | 80 段 | 276 训练 / 35 验证 / 35 测试 | 同校学妹，原创校园暧昧陪伴角色 |
+| 数据集 | 教师模型 | 原始对话 | SFT 目标 | 说明 |
+|---|---|---:|---:|---|
+| [许澄](xu-cheng/README.md) | 网页 GPT 系列；70 个会话 `unknown`，60 个记录 `GPT-6` | 100 段校准 + 30 段隔离测试 | 576 训练 / 142 验证 | 夜班图书管理员，原创温柔陪伴角色 |
+| [宋知意](song-zhiyi/README.md) | OpenCode `deepseek-v4.1-flash` | 80 段 | 276 训练 / 35 验证 / 35 测试 | 同校学妹，原创校园暧昧陪伴角色 |
+| [裴既明](pei-jiming/README.md) | OpenCode `deepseek-v4.1-flash` | 120 段主对话 + 60 条长回复分支 | 577 训练 / 54 验证 / 45 测试 | 原创乙女向角色，现代都市暧昧陪伴 |
 
 所有 `user` 和 `assistant` 内容均为教师模型按项目角色设定生成的虚构对话，不包含真实用户聊天记录。
-
-Chat-Huanhuan 的甄嬛数据来自第三方影视剧本衍生数据，因此只保留实验配置和汇总结果，
-不放入本仓库。见
-[`experiments/huanhuan/README.md`](../experiments/huanhuan/README.md)。
 
 ## 文件结构
 
@@ -25,6 +22,9 @@ Chat-Huanhuan 的甄嬛数据来自第三方影视剧本衍生数据，因此只
 - 数据审计或质量门禁结果（存在时）。
 
 SFT 行的 `system_prompt` 与训练时一致。`messages` 包含当前样本可见的对话历史。
+
+三个可复现实验的训练命令、assistant-only 标签规则、split 原则和常见错误见
+[`docs/REPRODUCTION.md`](../docs/REPRODUCTION.md)。
 
 ## 使用边界
 

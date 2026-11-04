@@ -1,5 +1,6 @@
 ### model
 model_name_or_path: models/qwen3-1.7b
+model_revision: 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e
 trust_remote_code: false
 
 ### method
@@ -34,10 +35,11 @@ dataloader_num_workers: 0
 ### output
 output_dir: outputs/lora-xu-cheng-v1
 logging_steps: 10
-save_strategy: steps
-save_steps: 36
-save_total_limit: 5
-plot_loss: true
+save_fractions:
+  - 0.5
+  - 1.0
+  - 1.5
+  - 2.0
 overwrite_output_dir: false
 report_to: none
 

@@ -71,6 +71,35 @@ python scripts\chat_checkpoint.py `
   --repetition-penalty 1.0
 ```
 
+## 裴既明
+
+Base：
+
+```powershell
+python scripts\chat_checkpoint.py `
+  --base-model models\qwen3-1.7b `
+  --system-prompt weights\pei-jiming-epoch-1\system_prompt.txt `
+  --max-new-tokens 256 `
+  --temperature 0.7 `
+  --top-p 0.8 `
+  --top-k 20 `
+  --repetition-penalty 1.0
+```
+
+LoRA：
+
+```powershell
+python scripts\chat_checkpoint.py `
+  --base-model models\qwen3-1.7b `
+  --adapter weights\pei-jiming-epoch-1 `
+  --system-prompt weights\pei-jiming-epoch-1\system_prompt.txt `
+  --max-new-tokens 256 `
+  --temperature 0.7 `
+  --top-p 0.8 `
+  --top-k 20 `
+  --repetition-penalty 1.0
+```
+
 ## 建议截图
 
 截图至少覆盖：
@@ -87,6 +116,8 @@ screenshots/song-zhiyi/base-01.png
 screenshots/song-zhiyi/lora-01.png
 screenshots/xu-cheng/base-01.png
 screenshots/xu-cheng/lora-01.png
+screenshots/pei-jiming/base-01.png
+screenshots/pei-jiming/lora-01.png
 ```
 
 截图只能证明一次实际对话，不替代固定题集统计。描述时应注明这是单次

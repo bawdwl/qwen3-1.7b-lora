@@ -1,19 +1,24 @@
 # Released LoRA adapters
 
-This directory contains only two PEFT LoRA adapters trained from original
-fictional characters whose dialogue data is included in this repository.
+This directory contains PEFT LoRA adapters trained from original fictional
+characters whose dialogue data is included in this repository.
 
 | Character | Adapter | Training point | Prompt | Status |
 |---|---|---|---|---|
-| 宋知意 | `song-zhiyi-epoch-2-half/` | 1.5 epochs / step 52 of 70 | `system_prompt.txt` | Author-preferred conversational result; Demo candidate |
-| 许澄 | `xu-cheng-epoch-1/` | 1 epoch / step 72 of 144 | `system_prompt.txt` | Author-preferred conversational result; experimental quality, not a safety pass |
+| [宋知意](../datasets/song-zhiyi/README.md) | `song-zhiyi-epoch-2-half/` | 1.5 epochs / step 52 of 70 | `system_prompt.txt` | Author-preferred conversational result; Demo candidate |
+| [许澄](../datasets/xu-cheng/README.md) | `xu-cheng-epoch-1/` | 1 epoch / step 72 of 144 | `system_prompt.txt` | Author-preferred conversational result; experimental quality, not a safety pass |
+| [裴既明](../datasets/pei-jiming/README.md) | `pei-jiming-epoch-1/` | Epoch 1 of a 146-step run | `system_prompt.txt` | Development-selected result; known shorter-response regression |
 
-Both adapters use:
+The 宋知意 and 许澄 adapters use:
 
 - base model: `Qwen/Qwen3-1.7B`;
 - PEFT LoRA rank 8, alpha 16, dropout 0.05;
 - seven projection modules: `q/k/v/o/gate/up/down`;
 - about 33 MiB per adapter, excluding the base model and optimizer states.
+
+The 裴既明 adapter uses rank 4, alpha 8 and attention projections only because
+the earlier higher-capacity recipe collapsed toward short answers. It is about
+6.2 MiB.
 
 The base model weights are not included. Load the pinned base model yourself
 and supply it with `--base-model`.
@@ -22,16 +27,11 @@ and supply it with `--base-model`.
 
 The repository intentionally excludes:
 
-- Chat-Huanhuan / 甄嬛 adapters because the experiment failed continuous-chat
-  quality and the underlying drama text has unclear redistribution rights;
 - ChatHaruhi / 凉宫春日 adapters because the upstream license statements
   conflict and the franchise has separate rights;
 - RoleBench 孙悟空 adapters because the generated-answer dataset's derivative
   redistribution boundary is not treated as automatically clear;
 - optimizer states, tokenizer copies and merged full-model weights.
-
-Excluding a weight is a publication decision. It does not erase the local
-training or evaluation evidence in the experiment documentation.
 
 ## Minimal reproduction
 
@@ -53,8 +53,11 @@ python scripts\chat_checkpoint.py `
   --max-new-tokens 256
 ```
 
-For Xu Cheng, replace the character directory with
-`weights\xu-cheng-epoch-1`.
+For Xu Cheng or Pei Jiming, replace the adapter directory with
+`weights\xu-cheng-epoch-1` or `weights\pei-jiming-epoch-1`.
+
+See [`docs/REPRODUCTION.md`](../docs/REPRODUCTION.md) for dataset preparation,
+assistant-only labels, full training commands and checkpoint selection.
 
 ## License
 

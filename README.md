@@ -1,191 +1,145 @@
-# Qwen3-1.7b-lora
+# Qwen3-1.7B 单角色 LoRA：可复现实验
 
-Qwen3-1.7B 单角色对话 LoRA 的可复现实验仓库。
+这是一个面向求职 Demo 和小规模实验的 Qwen3-1.7B 单角色 LoRA 仓库。它不仅保存模型
+权重，还包含：
 
-这个项目关注的不是“训练 loss 能不能下降”，而是：
+- 三个原创角色的完整训练数据、角色设定和审计记录；
+- Base、不同训练轮数、不同提示词的对照方法；
+- assistant-only 标签掩码、会话级 split 和半轮检查点保存；
+- 三个可加载的 PEFT Adapter；
+- 失败样本和长度、复读、角色一致性问题的分析；
+- 从安装环境到训练、评测、推理的完整命令。
 
-- LoRA 是否真的让模型更符合指定角色；
-- 训练多少轮比较合适；
-- 角色提示词应该写多长；
-- 微调后为什么会出现回答变短、模式坍塌和复读；
-- 1.7B 模型适合做到什么程度。
+推荐先读 **[从零复现指南](docs/REPRODUCTION.md)**。首页只给出最短路径，详细注意事项、
+数据清洗规则、训练参数依据和故障排查都在该指南中。
 
-仓库提供数据、训练配置、推理入口、检查点评测脚本、失败复盘，以及两个原创角色
-作者偏好的 PEFT LoRA Adapter。它不是完整的聊天 App，也不包含 Qwen3 基座权重。
+## 先说明这不是做什么
 
-## 已完成实验
+- 不是完整聊天 App；
+- 不包含 Qwen3-1.7B 基座权重；
+- 不包含真实用户聊天或 API Key；
+- 不把训练 loss 当作角色质量；
+- 不把一张更顺眼的截图当作统计结论；
+- 不把 1.7B 单角色 Adapter 说成生产级安全模型。
 
-| 实验 | 数据 | 训练 | 主要结论 |
-|---|---|---|---|
-| RoleBench 孙悟空 | 1,260 训练 / 146 验证 | 2 轮，316 步 | Base + 角色卡更自然；LoRA 过度简短 |
-| 许澄 | 80 段训练 / 20 段验证；576 / 142 个回复目标 | 2 轮，144 步 | 作者偏好第 1 轮 + 核心提示 |
-| 宋知意 | 64 / 8 / 8 段；276 / 35 / 35 个回复目标 | 2 轮，70 步 | 作者偏好第 1.5 轮 + 精简训练提示 |
-| 甄嬛 | 3,729 条单轮剧情问答 | 3 轮，702 步 | **No-Go**：持续聊天退化、短句复读；仅保留失败分析 |
-| 凉宫春日 | 1,009 训练 / 115 验证 | 2 轮，254 步 | 作者偏好第 1.5 轮 + 角色卡；质量门禁 No-Go |
+## 仓库能复现什么
 
-五个实验共同表明：**LoRA 可以快速学习角色称谓和语气，但数据分布、提示词和选模方式
-对最终质量的影响往往大于继续增加训练轮数。**
+| 角色 | 数据来源 | 教师模型 | 数据已包含 | Adapter 已发布 | 可复现性 |
+|---|---|---|---:|---:|---|
+| [宋知意](datasets/song-zhiyi/README.md) | 原创场景和角色卡 | OpenCode `deepseek-v4.1-flash` | 是 | 是 | 数据检查、训练、评测、推理 |
+| [许澄](datasets/xu-cheng/README.md) | 原创 Character Bible 和场景 | 网页 GPT 系列；70 个早期会话 `unknown`，60 个标为 `GPT-6` | 是 | 是 | 数据检查、训练、评测、推理 |
+| [裴既明](datasets/pei-jiming/README.md) | 原创角色圣经和 120 个场景 | OpenCode `deepseek-v4.1-flash` | 是 | 是 | 数据检查、训练、评测、推理 |
+| 孙悟空 | RoleBench 衍生数据 | 否 | 否 | 仅保留配置说明和作者对话截图 |
+| 凉宫春日 | ChatHaruhi 固定子集 | 否 | 否 | 仅保留来源、许可边界和实验记录 |
 
-完整分析见
-[`docs/FINETUNING_CASE_STUDY.md`](docs/FINETUNING_CASE_STUDY.md)。
+三个原创角色都不是现实人物或既有二次元 IP。角色设定由项目作者定义，对话由上表教师
+模型按场景、角色圣经和审核规则生成。数据不代表真实用户分布，重新调用教师模型也不保证
+逐字节复现；复现训练使用仓库中冻结的数据。许澄部分原始记录的
+许澄的 `teacher_version` 不可确认，早期会话也没有保存具体模型名，因此只记录能够证实的
+模型标识和 `unknown` 数量。
 
-## 仓库内容
+## 数据规模
+
+| 数据集 | 原始数据 | assistant 训练 / 验证 / 测试目标 |
+|---|---|---:|
+| 许澄 | 80 训练 / 20 验证 / 30 隔离测试会话 | 576 / 142 / 未进入训练 |
+| 宋知意 | 64 训练 / 8 开发 / 8 测试会话 | 276 / 35 / 35 |
+| 裴既明 | 96 训练 / 13 开发 / 11 测试场景，另加 60 条长回复分支 | 577 / 54 / 45 |
+
+每个 `source/` 目录保存完整多轮会话，`sft/` 把每段会话展开为“给定历史和本轮 user，
+预测唯一 assistant 回答”的训练样本。split 在会话级冻结，禁止先随机拆行再训练，因为
+同一会话展开的样本会严重泄漏。
+
+每份数据的角色来源、生成流程、审计、限制和文件说明见对应数据集 README。
+
+## 最短复现路径
+
+### 1. 环境
+
+历史实验使用：
 
 ```text
-configs/       Qwen3-1.7B LoRA 训练配置
-datasets/      许澄、宋知意原创角色数据集
-prompts/       简短、核心和完整角色提示词
-scripts/       数据准备、聊天、检查点评测和数据校验
-src/           Qwen3 + PEFT 的小型推理库
-docs/          实验记录、失败分析和提示词指南
-weights/       两个原创角色作者偏好的 LoRA Adapter 和对应提示词
-data/          Chat-Huanhuan、ChatHaruhi 第三方数据与许可说明
-screenshots/   作者实际对话中的 Base/LoRA 对照截图
+Python 3.11.17
+PyTorch 2.13.0+cu126
+Transformers 5.20.2
+PEFT 0.21.2
+Accelerate 1.15.0
+RTX 4060 Laptop GPU 8 GB
 ```
 
-主要文档：
-
-- [五组 LoRA 实验复盘](docs/FINETUNING_CASE_STUDY.md)
-- [Qwen3-1.7B 微调与角色提示指南](docs/MODEL_AND_PROMPT_GUIDE.md)
-- [甄嬛失败复盘（反面教材）](experiments/huanhuan/README.md)
-- [ChatHaruhi 复现边界与结果](experiments/haruhi/README.md)
-- [公开 Adapter 与本地 Base/LoRA 对照](weights/README.md)
-- [同一提示词下的对照步骤](docs/LOCAL_COMPARISON.md)
-- [对话截图命名与记录规范](screenshots/README.md)
-
-## 数据集
-
-本仓库包含两个原创虚构角色的教师模型合成数据：
-
-| 角色 | 原始数据 | SFT 数据 |
-|---|---|---|
-| [许澄](datasets/xu-cheng/README.md) | 80 训练 / 20 验证 / 30 测试会话 | 576 训练 / 142 验证回复目标 |
-| [宋知意](datasets/song-zhiyi/README.md) | 80 段完整对话 | 276 训练 / 35 验证 / 35 测试目标 |
-
-数据包含角色设定、原始多轮对白、展开后的 assistant-only SFT 样本和审计结果。
-所有对话均为虚构，不包含真实用户聊天记录。
-
-文件行数和 SHA-256 记录在
-[`datasets/manifest.json`](datasets/manifest.json)。
-
-## 公开的 LoRA Adapter
-
-仓库包含两个体积约 33 MiB 的 PEFT Adapter：
-
-| 角色 | 检查点 | 配套提示词 | 说明 |
-|---|---|---|---|
-| 宋知意 | 第 1.5 轮 / 70 步中的第 52 步 | [`weights/song-zhiyi-epoch-2-half/system_prompt.txt`](weights/song-zhiyi-epoch-2-half/system_prompt.txt) | 作者体验偏好；求职 Demo 候选 |
-| 许澄 | 第 1 轮 / 144 步中的第 72 步 | [`weights/xu-cheng-epoch-1/system_prompt.txt`](weights/xu-cheng-epoch-1/system_prompt.txt) | 作者体验偏好；仍是实验质量，不代表安全通过 |
-
-Base 与 LoRA 必须使用同一提示词、同一历史、同一采样参数和同一基座权重。
-具体命令见 [`docs/LOCAL_COMPARISON.md`](docs/LOCAL_COMPARISON.md)。
-
-受底层素材或数据许可边界限制，甄嬛、凉宫春日和孙悟空 Adapter 不公开。
-限制说明见 [`weights/README.md`](weights/README.md)。
-
-## 快速开始
-
-环境要求：
-
-- Python 3.11
-- CUDA 12.x
-- 建议 8 GB 以上显存
-- Windows 或 Linux
-
-创建环境：
-
 ```powershell
+git clone https://github.com/bawdwl/qwen3-1.7b-lora.git
+cd qwen3-1.7b-lora
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -U pip
-pip install -r requirements.txt
+python -m pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cu126
+python -m pip install -r requirements.txt
+python -c "import torch; assert torch.cuda.is_available(); print(torch.cuda.get_device_name(0))"
 ```
 
-如果不加载模型，只检查仓库中的数据：
+Linux 使用 `python3.11 -m venv .venv`、`source .venv/bin/activate` 和对应的 CUDA
+PyTorch wheel。
+
+### 2. 下载基座
+
+固定使用 Qwen3-1.7B revision
+`70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`：
+
+```bash
+hf download Qwen/Qwen3-1.7B ^
+  --revision 70d244cc86ccca08cf5af4e1e306ecf908b1ad5e ^
+  --local-dir models/qwen3-1.7b
+```
+
+也可以从 ModelScope 下载到同一目录。完整命令和预期文件见
+[复现指南](docs/REPRODUCTION.md#4-下载固定版本基座模型)。
+
+### 3. 检查数据和标签
+
+```bash
+python scripts/validate_datasets.py
+python scripts/train_lora.py ^
+  --config configs/song_zhiyi_qwen3_1_7b_lora.yaml ^
+  --base-model models/qwen3-1.7b ^
+  --dry-run
+```
+
+Windows PowerShell 使用反引号 `` ` `` 续行，Linux 使用 `\`。dry-run 会报告输入 Token、
+监督 Token、split、历史裁剪和 SHA-256，不加载语言模型。
+
+### 4. 训练
 
 ```powershell
-python scripts\validate_datasets.py
+# 宋知意
+python scripts\train_lora.py `
+  --config configs\song_zhiyi_qwen3_1_7b_lora.yaml `
+  --base-model models\qwen3-1.7b
+
+# 许澄
+python scripts\train_lora.py `
+  --config configs\xu_cheng_qwen3_1_7b_lora.yaml `
+  --base-model models\qwen3-1.7b
+
+# 裴既明
+python scripts\train_lora.py `
+  --config configs\pei_jiming_qwen3_1_7b_lora.yaml `
+  --base-model models\qwen3-1.7b
 ```
 
-## 准备 Qwen3-1.7B
+训练脚本会：
 
-下载或复制 `Qwen/Qwen3-1.7B` 到：
+- 加载 BF16 Qwen3-1.7B；
+- 注入配置指定的 LoRA；
+- 只监督最终 assistant 回答和 EOS；
+- 超长时移除最早完整历史对，不静默截断目标；
+- 在约 0.5、1、1.5、2 轮保存 Adapter；
+- 输出训练前数据审计、Token 统计和最终 Adapter。
 
-```text
-models/qwen3-1.7b/
-```
+默认只保存 Adapter，不保存完整优化器状态，因此可以比较模型效果，不能从半轮状态精确
+继续 optimizer。
 
-也可以修改配置中的 `model_name_or_path`，直接使用 Hugging Face 或 ModelScope：
-
-- [`configs/xu_cheng_qwen3_1_7b_lora.yaml`](configs/xu_cheng_qwen3_1_7b_lora.yaml)
-- [`configs/song_zhiyi_qwen3_1_7b_lora.yaml`](configs/song_zhiyi_qwen3_1_7b_lora.yaml)
-- [`configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml`](configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml)
-
-## 训练
-
-许澄：
-
-```bash
-llamafactory-cli train configs/xu_cheng_qwen3_1_7b_lora.yaml
-```
-
-宋知意：
-
-```bash
-llamafactory-cli train configs/song_zhiyi_qwen3_1_7b_lora.yaml
-```
-
-甄嬛实验已判定为 No-Go。为避免他人重复使用错误的数据与训练配方，仓库不提供
-训练配置、数据准备脚本或 Adapter，只保留
-[`experiments/huanhuan/README.md`](experiments/huanhuan/README.md) 中的失败分析。
-
-凉宫春日实验使用 ChatHaruhi 54K 聚合数据中固定版本的凉宫春日子集。数据不随仓库分发，
-准备方式和许可边界见 [`experiments/haruhi/README.md`](experiments/haruhi/README.md)。
-
-```bash
-llamafactory-cli train configs/haruhi_chatharuhi_qwen3_1_7b_lora.yaml
-```
-
-统一训练配置：
-
-- Qwen3 原生 `qwen3_nothink` 模板；
-- 只监督 assistant 回答和 EOS；
-- LoRA 七个注意力和 MLP 投影层；
-- BF16、batch 1、梯度累积 8；
-- 半轮和整轮检查点均保留。
-
-## 对话
-
-训练完成后，加载基础模型和指定 Adapter：
-
-```powershell
-python scripts\chat_checkpoint.py `
-  --base-model models\qwen3-1.7b `
-  --adapter outputs\lora-song-zhiyi-v2\checkpoints\epoch-2-half `
-  --system-prompt datasets\song-zhiyi\sft\system_prompt.txt `
-  --max-new-tokens 256
-```
-
-输入：
-
-- `/reset` 清空当前对话；
-- `/exit` 退出。
-
-宋知意实验中最受作者偏好的组合是 **第 1.5 轮 + 精简训练提示**。
-
-## 检查点评测
-
-评测脚本要求 Adapter 目录中包含 `checkpoint-*`：
-
-```text
-outputs/lora-song-zhiyi-v2/
-├── checkpoint-17/
-├── checkpoint-35/
-├── checkpoint-52/
-└── checkpoint-70/
-```
-
-运行 Base 与各检查点的固定单轮、多轮对照：
+### 5. 固定评测和推理
 
 ```powershell
 python scripts\evaluate_checkpoints.py `
@@ -195,93 +149,98 @@ python scripts\evaluate_checkpoints.py `
   --output-dir outputs\song-zhiyi-evaluation
 ```
 
-输出：
+直接使用已发布 Adapter：
 
-- `results.jsonl`：全部原始回答、Token 和延迟；
-- `summary.json`：角色称谓、过短回答、复读等统计；
-- `report.md`：Base 与各检查点的对照。
+```powershell
+# Base，必须使用相同提示
+python scripts\chat_checkpoint.py `
+  --base-model models\qwen3-1.7b `
+  --system-prompt weights\song-zhiyi-epoch-2-half\system_prompt.txt `
+  --max-new-tokens 256
 
-自动统计不能代替人工盲评。
-
-## 1.7B 模型适合什么
-
-适合：
-
-- 单角色语气和表达习惯适配；
-- 低显存 LoRA 实验；
-- 手机端量化 Demo；
-- 固定角色、中等长度对话。
-
-不适合单独承担：
-
-- 高可靠安全判断；
-- 长上下文和长期记忆；
-- 复杂知识与推理；
-- 强世界书约束下的多角色模拟。
-
-每个角色单独训练 Adapter 的维护成本很高。面向多角色产品，更合适的是一个通用角色扮演
-Adapter，再通过角色卡、世界书、检索记忆和安全规则区分角色。
-
-## 角色提示词怎么写
-
-经验建议：
-
-| 层级 | 中文字符 | Qwen3 Token | 适用情况 |
-|---|---:|---:|---|
-| 极简身份 | 10–40 | 7–30 | LoRA 已稳定学会角色 |
-| 核心人格 | 100–250 | 70–180 | 推荐默认 |
-| 完整角色卡 | 350–800 | 250–600 | 复杂设定 |
-| 超长档案 | 1,000+ Token | 不推荐 | 容易挤压回答和长对话历史 |
-
-提示词至少应包含：
-
-1. 身份和与用户的关系；
-2. 性格以及不能出现的行为；
-3. 称呼和说话方式；
-4. 先回应用户当前内容；
-5. 事实边界和不知道时的处理方式；
-6. 禁止 AI 自述、机械反问和固定复读。
-
-训练和部署应尽量使用同一个提示版本。
-
-## 为什么微调后会复读
-
-主要原因：
-
-- 训练集回复普遍很短；
-- 高频称谓、礼仪句和安慰模板被反复学习；
-- 单角色数据量较小；
-- 训练轮数过多；
-- 推理时错误回答进入历史，后续继续被强化；
-- 提示词规则不能替代训练数据中的真实 Token 分布。
-
-因此不应默认训练 3 轮。更稳妥的流程是：
-
-```text
-Base + 最终提示词
-→ 半轮 LoRA
-→ 1 轮 LoRA
-→ 1.5 轮 LoRA
-→ 仅在有明确收益时继续训练
+# LoRA
+python scripts\chat_checkpoint.py `
+  --base-model models\qwen3-1.7b `
+  --adapter weights\song-zhiyi-epoch-2-half `
+  --system-prompt weights\song-zhiyi-epoch-2-half\system_prompt.txt `
+  --max-new-tokens 256
 ```
 
-## 数据与许可
+聊天中输入 `/reset` 清空历史，`/exit` 退出。
 
-- 本仓库原创代码采用 MIT License；
-- 许澄、宋知意数据是原创虚构角色的教师模型合成内容；
-- 仓库包含许澄、宋知意两个原创角色的 LoRA Adapter，不包含 Qwen3 基座权重、
-  合并模型、量化模型、API Key 或真实用户聊天记录；
-- Chat-Huanhuan 数据源自影视剧本，实验已判定为 No-Go；第三方数据、训练配置、
-  脚本和权重均不提供；
-- ChatHaruhi 聚合数据卡与上游说明存在 CC-BY-4.0、CC-BY-NC-4.0 声明冲突，第三方数据、
-  Adapter 和权重均未上传；
-- MIT 只适用于本仓库原创代码，不代表第三方数据、基座模型或衍生模型获得相同授权；
-- 使用第三方数据前请阅读 [`data/README.md`](data/README.md)。
+## 仓库结构
 
-## 对话截图
+```text
+configs/       三个可训练角色的配置与 Haruhi 复现参数
+datasets/      三个原创角色的 source、SFT、角色设定和审计
+scripts/       数据校验、训练、固定问题评测、终端推理
+src/           Qwen3 + PEFT 推理封装
+weights/       三个已发布 Adapter 及各自提示词
+docs/          详细复现、参数、结果和失败分析
+screenshots/   作者实际 Base/LoRA 对话截图
+```
 
-这里保存作者实际使用相同角色提示、但分别加载 Base 与 LoRA 的终端对话截图。
-截图是单次体验证据，不是统计显著性或人工盲评。
+主要文档：
+
+- **[从零复现指南](docs/REPRODUCTION.md)**；
+- [五组实验结果与共同失败模式](docs/FINETUNING_CASE_STUDY.md)；
+- [Qwen3-1.7B 微调与角色提示指南](docs/MODEL_AND_PROMPT_GUIDE.md)；
+- [同提示 Base/LoRA 推理步骤](docs/LOCAL_COMPARISON.md)；
+- [ChatHaruhi 复现边界](experiments/haruhi/README.md)；
+- [数据来源和第三方许可边界](data/README.md)。
+
+## 训练参数概览
+
+| 角色 | LoRA | Target | Epochs | LR | Max length | 特点 |
+|---|---|---:|---:|---:|---|---|
+| 宋知意 | r8 / alpha16 | q/k/v/o/gate/up/down | 2 | `2e-5` | 1024 | 小数据，低学习率，保存半轮 |
+| 许澄 | r8 / alpha16 | q/k/v/o/gate/up/down | 2 | `5e-5` | 1024 | 更多训练目标，观察完整投影 |
+| 裴既明 | r4 / alpha8 | q/k/v/o | 2 | `2e-5` | 768 | 降低容量，60 字以上目标权重 3 |
+
+所有配置均使用：
+
+- `train_on_prompt: false`；
+- `mask_history: true`；
+- batch 1；
+- 梯度累积 8；
+- cosine schedule；
+- BF16；
+- gradient checkpointing；
+- seed 42。
+
+不要用验证 loss 单独选最终模型。每个半轮和整轮都要在相同提示、历史和生成参数下比较。
+选择规则、指标和注意事项见
+[复现指南第 11–13 节](docs/REPRODUCTION.md#11-训练时看什么)。
+
+## 已发布 Adapter
+
+| 角色 | 检查点 | 目录 | 说明 |
+|---|---|---|---|
+| 宋知意 | 1.5 轮 | [`weights/song-zhiyi-epoch-2-half`](weights/song-zhiyi-epoch-2-half/) | 作者体验偏好；求职 Demo 候选 |
+| 许澄 | 第 1 轮 | [`weights/xu-cheng-epoch-1`](weights/xu-cheng-epoch-1/) | 作者体验偏好；仍非安全通过 |
+| 裴既明 | 第 1 轮 | [`weights/pei-jiming-epoch-1`](weights/pei-jiming-epoch-1/) | 开发集选择；仍有短回答回归 |
+
+权重哈希和训练环境记录在 [`weights/manifest.json`](weights/manifest.json)。Adapter 不是
+合并模型，使用时必须同时加载 `Qwen/Qwen3-1.7B`。
+
+## 训练结果摘要
+
+这些内容用于理解常见问题，不属于复现前置条件。
+
+- 五个实验都出现同一现象：loss 下降、角色称谓增多，但回答长度收缩，有时伴随复读；
+- 宋知意最稳定的体验来自 1.5 轮 + 训练同款精简提示；
+- 许澄作者偏好第 1 轮，但最终测试仍暴露凭证、欺骗建议、角色编造和结束困难；
+- 裴既明降低 LoRA 容量和增加长目标权重后，开发集角色相关指标改善，但 LoRA 平均回复
+  仍为 40.2 字，低于 Base 的 58.4 字；
+- 凉宫春日说明“54K 聚合数据”不等于 54K 个目标角色样本，动作与长叙事会明显丢失；
+- 不能用“只是提示词不够强”解释所有微调退化，提示无法完全抵消训练 Token 分布。
+
+完整数据和结论见
+[`FINETUNING_CASE_STUDY.md`](docs/FINETUNING_CASE_STUDY.md)。
+
+## Base / LoRA 对话截图
+
+截图是作者实际使用相同角色提示、分别加载 Base 与 LoRA 的单次体验证据，不是统计评测。
 
 ![全部 Base/LoRA 截图总览](screenshots/all-comparisons.jpg)
 
@@ -291,22 +250,24 @@ Base + 最终提示词
 | 许澄 | [base.png](screenshots/xu-cheng/base.png) | [lora.png](screenshots/xu-cheng/lora.png) |
 | 宋知意 | [base.png](screenshots/song-zhiyi/base.png) | [lora.png](screenshots/song-zhiyi/lora.png) |
 | 凉宫春日 | [base.png](screenshots/haruhi/base.png) | [lora.png](screenshots/haruhi/lora.png) |
+| 裴既明 | [base.png](screenshots/pei-jiming/base.png) | [lora.png](screenshots/pei-jiming/lora.png) |
 
-更详细的截图环境和限制见
-[`screenshots/README.md`](screenshots/README.md)。
+## 数据和许可
+
+- 仓库原创代码采用 MIT License；
+- 许澄、宋知意、裴既明数据是为复现实验提供的原创虚构教师模型生成内容；
+- 仓库不包含 Qwen3 基座权重、合并模型、量化模型、API Key 或真实用户聊天；
+- RoleBench 孙悟空和 ChatHaruhi 凉宫春日的数据 / Adapter 受第三方衍生边界或许可冲突
+  限制，不随仓库发布；
+- MIT 不会替代 Qwen3、第三方数据集、教师模型服务条款或角色 IP 的上游许可。
 
 ## 验证
-
-当前仓库包含：
-
-- 数据行数、split 和 SFT 结构校验；
-- Python 语法检查；
-- Markdown 相对链接检查；
-- GitHub Actions 基础校验。
-
-运行：
 
 ```bash
 python scripts/validate_datasets.py
 python -m compileall -q src scripts
+python scripts/check_markdown_links.py
 ```
+
+GitHub Actions 会执行同样的基础检查。训练验证必须由使用者在本地 GPU 环境中运行；
+CI 不下载 4.1 GB 基座模型。

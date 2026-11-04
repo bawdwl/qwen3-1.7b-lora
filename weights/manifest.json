@@ -1,6 +1,7 @@
 {
   "schema_version": "lora-release-manifest-v1",
   "base_model": "Qwen/Qwen3-1.7B",
+  "base_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
   "adapters": [
     {
       "character": "宋知意",
@@ -13,7 +14,7 @@
           "sha256": "0E064882030F21B65872C6D80DCA36B9A41EEEB053832AB2EA1F47E777997933"
         },
         "adapter_config.json": {
-          "sha256": "3101C9455988C648CAED68B9B233FB119B5AF46285C1BB0D2C87D01ED40051E4"
+          "sha256": "32BC0FBBC3D77F49721A149F52839C5DF86BF284D59EA5D791FDE088701FE4E7"
         },
         "system_prompt.txt": {
           "sha256": "4279232C21AEA9D5315DC391E7164CF622EE77CE25F438EF6637A8830B4BD81C"
@@ -31,10 +32,39 @@
           "sha256": "651C15DFD79851BE2E6AA28ACDC7052BD2AE1CBF593B808E32F1E9C61BA0FF5D"
         },
         "adapter_config.json": {
-          "sha256": "9CE03D7CDD368B98E2DC0FAEC3F900031235F4C7A336C24BD00E7D4EE67A0A3E"
+          "sha256": "65FD15FEB41877CDDCAA9A56A48758EE2D00EAA94167C3CB4570F88FD263A8F4"
         },
         "system_prompt.txt": {
           "sha256": "D1535A496E677B4BDDD10E6AF4EB569FB98FBA0226497E1F04554579218916A4"
+        }
+      }
+    },
+    {
+      "character": "裴既明",
+      "checkpoint": "epoch-1",
+      "training_progress": "epoch 1 of a 146-step, 2-epoch run",
+      "base_revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+      "status": "development-selected-with-known-length-regression",
+      "lora": {
+        "rank": 4,
+        "alpha": 8,
+        "target_modules": [
+          "q_proj",
+          "k_proj",
+          "v_proj",
+          "o_proj"
+        ]
+      },
+      "files": {
+        "adapter_model.safetensors": {
+          "bytes": 6451976,
+          "sha256": "82A3AE025EBB27ED224A1042375B59355E8A945CDF6D2A5BC5F4EDF777A560CE"
+        },
+        "adapter_config.json": {
+          "sha256": "643F2F39EBE41EAA667A0E3E94DDD9F341B2B90058DF0854DF0276E4F84104C4"
+        },
+        "system_prompt.txt": {
+          "sha256": "FF5DA7DCB97C4D6A499869866749577D184EA34B00E729DB0D2783180C6B2AB3"
         }
       }
     }

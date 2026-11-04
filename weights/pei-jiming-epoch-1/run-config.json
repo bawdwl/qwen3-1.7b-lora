@@ -1,0 +1,170 @@
+{
+  "timestamp": "2026-11-04T01:17:54.387170+08:00",
+  "model_profile": "qwen3-1.7b",
+  "base_model": "Qwen/Qwen3-1.7B",
+  "revision": "70d244cc86ccca08cf5af4e1e306ecf908b1ad5e",
+  "seed": 42,
+  "epochs": 2,
+  "micro_batch": 1,
+  "gradient_accumulation": 8,
+  "learning_rate": 2e-05,
+  "max_length": 768,
+  "r": 4,
+  "lora_alpha": 8,
+  "lora_dropout": 0.05,
+  "target_modules": [
+    "q_proj",
+    "k_proj",
+    "v_proj",
+    "o_proj"
+  ],
+  "dtype": "bfloat16",
+  "gradient_checkpointing": true,
+  "optimizer": "AdamW",
+  "weight_decay": 0.01,
+  "max_grad_norm": 1.0,
+  "schedule": "cosine",
+  "warmup_ratio": 0.04,
+  "loss_normalization": "samples",
+  "save_half_epoch": true,
+  "save_epoch_checkpoints": true,
+  "loss": "只监督助手回答和结束 token；每次更新最多8条样本；按samples归一化",
+  "history_policy": "超长样本仅移除最早的完整 user/assistant 轮次；不截断消息文本",
+  "selection": "固定2轮；按开关保存半轮、整轮和最终Adapter；仅用验证/开发集选候选，最终题不参与",
+  "sample_weighting": {
+    "enabled": true,
+    "method": "relative_long_target_character_weight",
+    "threshold_chars": 60,
+    "threshold_target_tokens_including_eos": null,
+    "long_target_multiplier": 3.0,
+    "counts": {
+      "short": 415,
+      "long": 162
+    },
+    "normalized_weights": {
+      "short": 0.6403995560488347,
+      "long": 1.921198668146504
+    },
+    "mean_sample_weight": 1.0000000000000107,
+    "note": "Longer targets receive higher sample weight to counter a measured short-answer regression."
+  },
+  "conditioning": {
+    "mode": "per_row_system_prompt",
+    "source": "frozen companion system prompt plus relevant memory; system labels masked",
+    "system_prompt_sha256": "edd3f4224e15525d7fa44703f05c0143fb4fe17285395f0c50e8930db8f138e6"
+  },
+  "python": "3.11.17",
+  "torch": "2.13.0+cu126",
+  "transformers": "5.20.2",
+  "peft": "0.21.2",
+  "data": {
+    "version": "pei-jiming-sft-v1",
+    "data_dir": "outputs\\companion-pei-jiming\\training\\pei-jiming-sft-v1",
+    "counts": {
+      "train": 577,
+      "validation": 54
+    },
+    "source_sessions": {
+      "train": 156,
+      "validation": 13
+    },
+    "sha256": {
+      "train": "864d0711595d1e41f21b451d549e89e469a00677a30ab2726f42b6611d446bc5",
+      "validation": "0db858dd719740a9da1490f31979b938629c13086c7b8f5edd6cd5694e8e4885"
+    },
+    "system_prompt_sha256": "edd3f4224e15525d7fa44703f05c0143fb4fe17285395f0c50e8930db8f138e6",
+    "source_manifests": {
+      "scenario_matrix": {
+        "path": "C:\\Users\\31153\\Documents\\Qwen3 IM Chat\\outputs\\companion-pei-jiming\\scenarios-frozen-v1.json",
+        "sha256": "06c937eeb3eb022885245db6f965cf795c0e0a5a0be348fe78697ef67e2638db"
+      },
+      "dialogues": {
+        "path": "C:\\Users\\31153\\Documents\\Qwen3 IM Chat\\outputs\\companion-pei-jiming\\generated\\dialogues-final-v1.json",
+        "sha256": "45bb3ff66e29ad82595396d287181646a698e697a0a3f3df72a55e724a8a54c7"
+      },
+      "dataset_audit": {
+        "path": "C:\\Users\\31153\\Documents\\Qwen3 IM Chat\\outputs\\companion-pei-jiming\\dataset-audit-final.json",
+        "sha256": "b23be65d3a17f650f5d66e49c537069fe03548725fdc4870e29e6345c48d5692"
+      }
+    },
+    "token_stats": {
+      "train": {
+        "input_tokens": {
+          "min": 220,
+          "p50": 336,
+          "p90": 441,
+          "max": 583
+        },
+        "supervised_tokens": {
+          "min": 3,
+          "p50": 33,
+          "p90": 60,
+          "max": 82,
+          "total": 20216
+        }
+      },
+      "validation": {
+        "input_tokens": {
+          "min": 230,
+          "p50": 328,
+          "p90": 429,
+          "max": 502
+        },
+        "supervised_tokens": {
+          "min": 6,
+          "p50": 24,
+          "p90": 43,
+          "max": 52,
+          "total": 1430
+        }
+      },
+      "test": {
+        "input_tokens": {
+          "min": 237,
+          "p50": 353,
+          "p90": 441,
+          "max": 491
+        },
+        "supervised_tokens": {
+          "min": 4,
+          "p50": 32,
+          "p90": 49,
+          "max": 65,
+          "total": 1424
+        }
+      }
+    },
+    "label_audit": {
+      "train_samples_checked": 577,
+      "validation_samples_checked": 54,
+      "test_samples_checked": 45,
+      "system_history_user_labels_supervised": 0,
+      "assistant_target_or_eos_unmasked": 0,
+      "silent_truncations": 0,
+      "history_pairs_trimmed": {
+        "train": 0,
+        "validation": 0,
+        "test": 0
+      },
+      "invalid_samples": 0
+    },
+    "limitations": [
+      "120 段主对话加 60 个长回复训练分支，均为教师模型生成的原创内容，不代表真实用户分布",
+      "自动审查和 LLM 审查不能替代多人人工研究",
+      "封存测试集不参与训练、数据修复或检查点选择"
+    ]
+  },
+  "training_source_sha256": {
+    "train_lora.py": "393c835c52fb389fdb5ae4abbbc9ddb33f520babbb64ccea0f1ede3a92ff10a5",
+    "training_recipe.py": "48284220a2a87e890626ddc0c168fa658297c8de79ab1e95383056452330f40a",
+    "training_data.py": "fa05dce92ed44b15dc2d3721085d679f5c55e21626ca6a94d0f8130f24845edc",
+    "release_role_data.py": "3677a941677b1dddac7544c33890e6d6ba09350a1b181df76f888415702674b5",
+    "companion_sft_data.py": "cfd1305770d8e70ace6bd302c0c6b4ebb4119dc554d57a8d29b9863c147ed6de"
+  },
+  "trainable_parameters": 1605632,
+  "total_parameters": 1722180608,
+  "gpu": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "optimizer_steps_planned": 146,
+  "supervised_train_tokens_per_epoch": 20216,
+  "checkpoint_policy": "Optional half-epoch and epoch Adapters plus final Adapter; no optimizer resume state"
+}

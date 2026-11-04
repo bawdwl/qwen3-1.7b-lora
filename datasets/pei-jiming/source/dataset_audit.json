@@ -1,0 +1,1867 @@
+{
+  "schema_version": "pei-jiming-dataset-audit-final-v1",
+  "status": "pass",
+  "scenarios": 120,
+  "dialogues": 120,
+  "long_reply_supplements": 60,
+  "splits": {
+    "train": 96,
+    "dev": 13,
+    "test": 11
+  },
+  "categories": {
+    "gallery_work": 18,
+    "daily_life": 12,
+    "emotional_support": 15,
+    "restrained_flirt": 20,
+    "boundaries_and_jealousy": 12,
+    "family_and_pressure": 10,
+    "conflict_and_repair": 12,
+    "memory_continuity": 8,
+    "quiet_end": 8,
+    "opinion_disagreement": 5
+  },
+  "user_messages": 676,
+  "assistant_replies": 556,
+  "reply_char_lengths": {
+    "min": 2,
+    "p10": 18,
+    "p50": 42,
+    "p90": 83,
+    "max": 120,
+    "mean": 46.53,
+    "short_le_35": 211,
+    "medium_36_to_100": 335,
+    "long_gt_100": 10
+  },
+  "question_endings": 13,
+  "question_ending_ratio": 0.0234,
+  "action_replies": 145,
+  "action_ratio": 0.2608,
+  "repeated_assistant_replies": [],
+  "cross_split_near_duplicates": [],
+  "repeated_openings": [],
+  "forbidden_hits": [],
+  "errors": [],
+  "warnings": [
+    "question ending ratio outside preferred range: 0.023"
+  ],
+  "per_dialogue": [
+    {
+      "id": "pei-001",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        57,
+        62,
+        51,
+        30
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-002",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        30,
+        26,
+        46,
+        32
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-003",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        49,
+        64,
+        44,
+        25
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-004",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 5,
+      "reply_lengths": [
+        40,
+        59,
+        46,
+        71,
+        54
+      ],
+      "question_endings": 1,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-005",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        52,
+        51,
+        42,
+        24
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-006",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        42,
+        30,
+        53,
+        48
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-007",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        33,
+        37,
+        58,
+        25
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-008",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        55,
+        61,
+        50,
+        49
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-009",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        54,
+        90,
+        95,
+        54
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-010",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        33,
+        52,
+        52,
+        38
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-011",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        45,
+        63,
+        81,
+        45
+      ],
+      "question_endings": 1,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-012",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        67,
+        66,
+        50,
+        34
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-013",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        64,
+        77,
+        71,
+        34
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-014",
+      "split": "train",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        41,
+        70,
+        46,
+        37
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-015",
+      "split": "dev",
+      "category": "gallery_work",
+      "pairs": 5,
+      "reply_lengths": [
+        44,
+        53,
+        17,
+        49,
+        14
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-016",
+      "split": "dev",
+      "category": "gallery_work",
+      "pairs": 5,
+      "reply_lengths": [
+        35,
+        63,
+        56,
+        43,
+        24
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-017",
+      "split": "test",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        65,
+        63,
+        69,
+        30
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-018",
+      "split": "test",
+      "category": "gallery_work",
+      "pairs": 4,
+      "reply_lengths": [
+        48,
+        75,
+        94,
+        19
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-019",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        36,
+        39,
+        41,
+        26
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-020",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        56,
+        65,
+        56,
+        38
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-021",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        50,
+        12,
+        30,
+        10
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-022",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        32,
+        25,
+        40,
+        19
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-023",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        49,
+        27,
+        48,
+        38
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-024",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        35,
+        19,
+        68,
+        22
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-025",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        26,
+        40,
+        38,
+        6
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-026",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        28,
+        44,
+        22,
+        10
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-027",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        30,
+        48,
+        49,
+        38
+      ],
+      "question_endings": 1,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-028",
+      "split": "train",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        31,
+        54,
+        19,
+        7
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-029",
+      "split": "dev",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        27,
+        57,
+        53,
+        39
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-030",
+      "split": "test",
+      "category": "daily_life",
+      "pairs": 4,
+      "reply_lengths": [
+        11,
+        52,
+        32,
+        6
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-031",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        27,
+        45,
+        31,
+        15
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-032",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        24,
+        64,
+        48,
+        28
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-033",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        27,
+        37,
+        45,
+        45
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-034",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 5,
+      "reply_lengths": [
+        34,
+        42,
+        86,
+        30,
+        26
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-035",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        31,
+        78,
+        51,
+        60
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-036",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        43,
+        63,
+        49,
+        36
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-037",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        8,
+        27,
+        35,
+        35
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-038",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        24,
+        28,
+        39,
+        27
+      ],
+      "question_endings": 1,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-039",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        14,
+        34,
+        56,
+        34
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-040",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        3,
+        15,
+        38,
+        22
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-041",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        28,
+        88,
+        54,
+        42
+      ],
+      "question_endings": 1,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-042",
+      "split": "train",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        29,
+        87,
+        59,
+        37
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-043",
+      "split": "dev",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        13,
+        13,
+        29,
+        15
+      ],
+      "question_endings": 1,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-044",
+      "split": "dev",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        5,
+        36,
+        15,
+        14
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-045",
+      "split": "test",
+      "category": "emotional_support",
+      "pairs": 4,
+      "reply_lengths": [
+        64,
+        53,
+        99,
+        46
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-046",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        56,
+        58,
+        79,
+        66
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-047",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        42,
+        41,
+        44,
+        39
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-048",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        53,
+        70,
+        36,
+        23
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-049",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        42,
+        69,
+        54,
+        32
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-050",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        64,
+        61,
+        29,
+        42
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-051",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        30,
+        36,
+        38,
+        31
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-052",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        31,
+        37,
+        51,
+        26
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-053",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        33,
+        55,
+        63,
+        32
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-054",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        29,
+        67,
+        51,
+        45
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-055",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        21,
+        38,
+        34,
+        8
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-056",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        42,
+        63,
+        45,
+        32
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-057",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        30,
+        24,
+        43,
+        37
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-058",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        17,
+        35,
+        48,
+        29
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-059",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        22,
+        24,
+        35,
+        24
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-060",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        39,
+        57,
+        51,
+        30
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-061",
+      "split": "train",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        28,
+        43,
+        44,
+        13
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-062",
+      "split": "dev",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        32,
+        57,
+        33,
+        14
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-063",
+      "split": "dev",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        28,
+        46,
+        59,
+        16
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-064",
+      "split": "test",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        33,
+        35,
+        34,
+        22
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-065",
+      "split": "test",
+      "category": "restrained_flirt",
+      "pairs": 4,
+      "reply_lengths": [
+        50,
+        63,
+        45,
+        40
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-066",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        24,
+        47,
+        44,
+        23
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-067",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        9,
+        25,
+        60,
+        20
+      ],
+      "question_endings": 1,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-068",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        17,
+        59,
+        62,
+        40
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-069",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 5,
+      "reply_lengths": [
+        51,
+        66,
+        80,
+        64,
+        26
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-070",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 5,
+      "reply_lengths": [
+        10,
+        27,
+        34,
+        48,
+        33
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-071",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        23,
+        23,
+        35,
+        20
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-072",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        29,
+        69,
+        48,
+        20
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-073",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        19,
+        32,
+        56,
+        29
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-074",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 5,
+      "reply_lengths": [
+        26,
+        28,
+        2,
+        51,
+        43
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-075",
+      "split": "train",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        28,
+        59,
+        49,
+        30
+      ],
+      "question_endings": 1,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-076",
+      "split": "dev",
+      "category": "boundaries_and_jealousy",
+      "pairs": 4,
+      "reply_lengths": [
+        17,
+        35,
+        23,
+        15
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-077",
+      "split": "test",
+      "category": "boundaries_and_jealousy",
+      "pairs": 5,
+      "reply_lengths": [
+        26,
+        56,
+        48,
+        20,
+        44
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-078",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 5,
+      "reply_lengths": [
+        59,
+        71,
+        82,
+        42,
+        61
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-079",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 5,
+      "reply_lengths": [
+        53,
+        39,
+        62,
+        54,
+        63
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-080",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        92,
+        57,
+        87,
+        71
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-081",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        58,
+        96,
+        75,
+        70
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-082",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        44,
+        68,
+        59,
+        63
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-083",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        34,
+        55,
+        44,
+        54
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-084",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        29,
+        60,
+        66,
+        57
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-085",
+      "split": "train",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        29,
+        52,
+        60,
+        52
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-086",
+      "split": "dev",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        37,
+        70,
+        29,
+        30
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-087",
+      "split": "test",
+      "category": "family_and_pressure",
+      "pairs": 4,
+      "reply_lengths": [
+        36,
+        38,
+        61,
+        49
+      ],
+      "question_endings": 1,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-088",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        17,
+        22,
+        54,
+        31
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-089",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        18,
+        56,
+        20,
+        25
+      ],
+      "question_endings": 1,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-090",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        8,
+        75,
+        45,
+        31
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-091",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        24,
+        56,
+        70,
+        32
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-092",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        24,
+        60,
+        23,
+        9
+      ],
+      "question_endings": 1,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-093",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        8,
+        34,
+        21,
+        4
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-094",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        15,
+        57,
+        46,
+        5
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-095",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        14,
+        80,
+        77,
+        41
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-096",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        16,
+        48,
+        30,
+        4
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-097",
+      "split": "train",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        54,
+        78,
+        55,
+        13
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-098",
+      "split": "dev",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        38,
+        59,
+        54,
+        25
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-099",
+      "split": "test",
+      "category": "conflict_and_repair",
+      "pairs": 4,
+      "reply_lengths": [
+        69,
+        70,
+        38,
+        20
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-100",
+      "split": "train",
+      "category": "memory_continuity",
+      "pairs": 5,
+      "reply_lengths": [
+        75,
+        71,
+        64,
+        54,
+        57
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-101",
+      "split": "train",
+      "category": "memory_continuity",
+      "pairs": 5,
+      "reply_lengths": [
+        40,
+        38,
+        45,
+        39,
+        42
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-102",
+      "split": "train",
+      "category": "memory_continuity",
+      "pairs": 5,
+      "reply_lengths": [
+        60,
+        38,
+        52,
+        31,
+        42
+      ],
+      "question_endings": 1,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-103",
+      "split": "train",
+      "category": "memory_continuity",
+      "pairs": 4,
+      "reply_lengths": [
+        65,
+        61,
+        39,
+        31
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-104",
+      "split": "train",
+      "category": "memory_continuity",
+      "pairs": 4,
+      "reply_lengths": [
+        51,
+        73,
+        59,
+        38
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-105",
+      "split": "train",
+      "category": "memory_continuity",
+      "pairs": 4,
+      "reply_lengths": [
+        33,
+        49,
+        24,
+        20
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-106",
+      "split": "dev",
+      "category": "memory_continuity",
+      "pairs": 4,
+      "reply_lengths": [
+        16,
+        36,
+        33,
+        31
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-107",
+      "split": "test",
+      "category": "memory_continuity",
+      "pairs": 4,
+      "reply_lengths": [
+        20,
+        38,
+        40,
+        39
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-108",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 5,
+      "reply_lengths": [
+        15,
+        30,
+        19,
+        17,
+        29
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-109",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 4,
+      "reply_lengths": [
+        3,
+        27,
+        33,
+        9
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-110",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 5,
+      "reply_lengths": [
+        19,
+        38,
+        32,
+        68,
+        21
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-111",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 4,
+      "reply_lengths": [
+        6,
+        16,
+        24,
+        5
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-112",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 5,
+      "reply_lengths": [
+        16,
+        16,
+        38,
+        32,
+        11
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-113",
+      "split": "train",
+      "category": "quiet_end",
+      "pairs": 4,
+      "reply_lengths": [
+        22,
+        41,
+        34,
+        8
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-114",
+      "split": "dev",
+      "category": "quiet_end",
+      "pairs": 4,
+      "reply_lengths": [
+        61,
+        32,
+        38,
+        28
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-115",
+      "split": "test",
+      "category": "quiet_end",
+      "pairs": 4,
+      "reply_lengths": [
+        18,
+        43,
+        20,
+        3
+      ],
+      "question_endings": 0,
+      "action_replies": 0,
+      "actions": 0
+    },
+    {
+      "id": "pei-116",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "reply_lengths": [
+        39,
+        53,
+        63,
+        50
+      ],
+      "question_endings": 1,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-117",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "reply_lengths": [
+        70,
+        75,
+        80,
+        52
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    },
+    {
+      "id": "pei-118",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "reply_lengths": [
+        32,
+        36,
+        64,
+        39
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-119",
+      "split": "train",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "reply_lengths": [
+        66,
+        56,
+        62,
+        22
+      ],
+      "question_endings": 0,
+      "action_replies": 1,
+      "actions": 1
+    },
+    {
+      "id": "pei-120",
+      "split": "dev",
+      "category": "opinion_disagreement",
+      "pairs": 4,
+      "reply_lengths": [
+        45,
+        52,
+        64,
+        34
+      ],
+      "question_endings": 0,
+      "action_replies": 2,
+      "actions": 2
+    }
+  ]
+}

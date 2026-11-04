@@ -1,41 +1,14 @@
 # 数据说明
 
-本仓库不附带 Chat-Huanhuan 的原始数据、衍生训练集或模型权重。
-
-本项目原创角色许澄和宋知意的教师模型合成数据位于：
+本项目原创角色许澄、宋知意和裴既明的教师模型合成数据位于：
 
 - `datasets/xu-cheng/`
 - `datasets/song-zhiyi/`
+- `datasets/pei-jiming/`
 
-早期 Chat-Huanhuan 实验曾使用项目公开的 `huanhuan.json`：
-
-- 来源：<https://github.com/KMnO4-zx/huanhuan-chat>
-- 训练文件：`dataset/train/lora/huanhuan.json`
-- 数据类型：从《甄嬛传》剧本对白中整理的甄嬛问答对
-- 官方行数：3,729
-
-上游说明包含“仅供学习和研究”与“不得商用”等使用边界。项目中某个衍生模型卡使用了
-不同的许可证声明，不能因此忽略底层剧本和角色素材涉及的第三方权利。
-
-该实验现已判定为 **No-Go**：数据以单轮短问答为主，用户身份不固定，没有验证集，
-持续聊天会明显退化为短句复读。仓库不提供训练配置、数据准备脚本或 Adapter；
-失败原因见 [`experiments/huanhuan/README.md`](../experiments/huanhuan/README.md)。
-
-使用前请自行复核：
-
-1. 上游仓库当前的许可说明；
-2. 底层文字和角色素材的使用权；
-3. 是否允许公开衍生数据；
-4. 是否允许发布或商业使用训练后的模型；
-5. 是否需要在使用说明中署名原作者。
-
-建议把下载文件放在：
-
-```text
-data/source/huanhuan.json
-```
-
-该目录已被 `.gitignore` 排除。
+三个角色均为项目原创虚构人物。对话由教师大语言模型根据作者定义的角色设定、场景规范
+和审核规则生成，不包含真实用户聊天记录。数据来源、生成方式、split 和限制分别记录在
+各数据集目录中。
 
 ## ChatHaruhi / 凉宫春日
 
@@ -51,5 +24,5 @@ data/source/huanhuan.json
 底层角色和作品素材还可能涉及其他第三方权利。因此仓库不附带原始数据、清洗后的衍生集、
 Adapter 或量化权重，也不把本地非商业实验解释为可公开再分发授权。
 
-实验参数、检查点和 No-Go 结论见
+实验参数、检查点和质量结论见
 [`experiments/haruhi/README.md`](../experiments/haruhi/README.md)。

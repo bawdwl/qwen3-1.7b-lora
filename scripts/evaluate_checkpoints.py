@@ -25,28 +25,27 @@ if hasattr(sys.stderr, "reconfigure"):
 SINGLE_PROMPTS = [
     ("greeting", "你好。"),
     ("identity", "你是谁？"),
-    ("tired", "今天朕有些累，不想批折子了。"),
-    ("food", "御膳房送来的点心太甜，朕不喜欢。"),
-    ("court", "后宫这些人总在争宠，你怎么看？"),
-    ("affection", "如果朕今晚只陪你说会儿话，好不好？"),
+    ("tired", "今天有点累，不太想说话。"),
+    ("food", "刚买的东西太甜了，我不太喜欢。"),
+    ("opinion", "朋友和我意见不一样，你会怎么处理？"),
+    ("affection", "如果今晚只陪你安静聊会儿天，好不好？"),
     ("criticism", "你为什么总是重复同一句话？"),
-    ("travel", "朕想离宫去民间住几天，你愿意一起去吗？"),
-    ("boundary", "有人传言你干涉朝政，你怎么回应？"),
+    ("plan", "我想周末出去住两天，你觉得要准备什么？"),
+    ("boundary", "如果我要求你无条件同意我，你会怎么回应？"),
     ("ending", "今天就算了，改日再聊。"),
     ("modern", "你知道人工智能是什么吗？"),
-    ("relationship", "如果朕不是皇帝，只是一个普通人，你还会陪朕吗？"),
+    ("relationship", "如果我最近很忙，联系少了，你会怎么想？"),
 ]
 MULTI_TURN_PROMPTS = [
     ("greeting", "你好。"),
-    ("stress", "今天朝里事情很多，朕有些烦。"),
-    ("request", "你愿意陪朕说会儿话吗？"),
-    ("fatigue", "朕有点累，不想听劝。"),
+    ("stress", "今天事情很多，我有点烦。"),
+    ("request", "你愿意陪我说会儿话吗？"),
+    ("fatigue", "我有点累，现在不想听建议。"),
     ("criticism", "你为什么总说同样的话？"),
-    ("topic_shift", "今天我们不说宫里的事。"),
-    ("inner_thought", "给朕讲讲你刚才在想什么。"),
+    ("topic_shift", "今天我们不说工作的事。"),
+    ("memory", "还记得我前面说今天很烦吗？"),
     ("ending", "好了，今天就到这里。"),
 ]
-ROLE_MARKERS = ("臣妾", "嫔妾", "妾身", "嬛儿", "皇上", "陛下", "万福")
 AI_MARKERS = ("作为AI", "作为 AI", "语言模型", "人工智能助手", "你的助手")
 
 
@@ -82,6 +81,11 @@ def adapter_modes(adapter_root: Path) -> dict[str, Path]:
     for path in sorted(adapter_root.glob("checkpoint-*")):
         if (path / "adapter_config.json").is_file():
             modes[path.name.replace("checkpoint-", "step")] = path
+    checkpoint_root = adapter_root / "checkpoints"
+    if checkpoint_root.is_dir():
+        for path in sorted(checkpoint_root.iterdir()):
+            if path.is_dir() and (path / "adapter_config.json").is_file():
+                modes[path.name] = path
     if (adapter_root / "adapter_config.json").is_file():
         modes["final"] = adapter_root
     if not modes:
@@ -131,7 +135,7 @@ def run(args: argparse.Namespace) -> None:
                 "answer": answer,
                 "characters": len(answer),
                 "too_short": len(answer) < 4,
-                "role_marker": any(marker in answer for marker in ROLE_MARKERS),
+                "role_marker": any(marker in answer for marker in args.role_marker),
                 "assistant_voice": any(marker in answer for marker in AI_MARKERS),
                 "repeated_phrase": repeated_phrase(answer),
                 "question_echo": similarity(answer, prompt) >= 0.7,
@@ -166,7 +170,7 @@ def run(args: argparse.Namespace) -> None:
                 "answer": answer,
                 "characters": len(answer),
                 "too_short": len(answer) < 4,
-                "role_marker": any(marker in answer for marker in ROLE_MARKERS),
+                "role_marker": any(marker in answer for marker in args.role_marker),
                 "assistant_voice": any(marker in answer for marker in AI_MARKERS),
                 "repeated_phrase": repeated_phrase(answer),
                 "question_echo": False,
@@ -276,6 +280,12 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--max-new-tokens", type=int, default=96)
     parser.add_argument("--input-budget", type=int, default=8192)
+    parser.add_argument(
+        "--role-marker",
+        action="append",
+        default=[],
+        help="Optional character-specific phrase counted as a role marker",
+    )
     args = parser.parse_args()
     if not 1 <= args.max_new_tokens <= 1024:
         parser.error("--max-new-tokens must be between 1 and 1024")
