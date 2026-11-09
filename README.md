@@ -1,19 +1,66 @@
-# Qwen3-1.7B LoRA：从环境到训练、评测与部署
+# Qwen3-1.7B 角色 LoRA：从数据到端侧部署
 
-这是一个可实际执行的 Qwen3-1.7B LoRA 训练仓库。`scripts/train_lora.py` 不绑定角色，
-可以用于任意 system/user/assistant 对话数据；仓库内附三个原创角色实验，方便直接验证
-数据、训练、评测和 Adapter 加载整条链路。
+[![validation](https://github.com/bawdwl/qwen3-1.7b-lora/actions/workflows/validate.yml/badge.svg)](https://github.com/bawdwl/qwen3-1.7b-lora/actions/workflows/validate.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB)
+![GPU](https://img.shields.io/badge/Tested%20on-RTX%204060%208GB-76B900)
 
-核心目标不是只展示几个模型结果，而是回答：
+这是一个完整跑通 **角色数据构建 → Qwen3-1.7B LoRA 微调 → Base/LoRA 对照评测
+→ 检查点选择 → 合并与 MNN Q8 端侧部署** 的可复现项目。
 
-- 自己的数据能不能用于 Qwen3 LoRA；
-- 训练集、开发集、测试集应该怎么切；
-- assistant-only loss 如何实现，避免模型学习用户问题；
-- rank、alpha、学习率、epoch、batch 和上下文长度如何选择；
-- 怎么判断一个检查点是真的更好，而不是训练 loss 更低；
-- 如何在 8 GB 显存机器上跑通并保留可比较的检查点。
+仓库不只提供训练脚本，还保留了真实约束下的数据、配置、Adapter、评测结果和失败模式：
 
-**建议先读 [通用复现与参数指南](docs/REPRODUCTION.md)。** 本文提供最短路径和参数速查；
+- `scripts/train_lora.py` 不绑定角色，可用于任意 system/user/assistant 对话数据。
+- 附三个可公开复现的原创角色，以及两个因数据许可边界不发布的对照实验。
+- 训练采用 assistant-only loss，历史裁剪不会截断监督目标。
+- 使用固定开发集选择检查点，封存测试只运行一次。
+- 已发布 PEFT Adapter 和对应的 ModelScope MNN Q8 包，可继续在 Android/MNN Chat 中验证。
+
+建议先看 [复现与参数指南](docs/REPRODUCTION.md)；需要快速了解结果，可直接阅读下文的
+[项目成果](#项目成果)。参考来源见
+[官方文档与高星项目对照](docs/REFERENCES.md)。
+
+## 项目成果
+
+### Base / LoRA 实际对话
+
+<table>
+  <tr>
+    <td align="center"><img src="screenshots/song-zhiyi/base.png" width="440"><br><b>Qwen3-1.7B Base</b></td>
+    <td align="center"><img src="screenshots/song-zhiyi/lora.png" width="440"><br><b>宋知意 LoRA · 1.5 epochs</b></td>
+  </tr>
+</table>
+
+同一基座、同一角色提示词、相同生成参数下的 Base/LoRA 对照。更多结果见
+[全部对话截图](screenshots/README.md)；截图只代表单次实际对话，不等同于统计评测。
+
+### 已完成的角色实验
+
+| 角色 | 数据与来源 | 数据规模 | 选用检查点 | 公开产物 |
+|---|---|---:|---|---|
+| 宋知意 | 原创校园角色；OpenCode `deepseek-v4.1-flash` 生成 | 276 / 35 / 35 目标 | 1.5 轮 | Adapter + MNN Q8 |
+| 裴既明 | 原创乙女向角色；OpenCode `deepseek-v4.1-flash` 生成 | 577 / 54 / 45 目标 | 第 1 轮 | Adapter + MNN Q8 |
+| 许澄 | 原创 Character Bible；教师模型生成 | 576 / 142 目标 | 第 1 轮 | Adapter + MNN Q8 |
+| 孙悟空 | RoleBench 衍生数据 | 1,260 / 146 | 第 2 轮复测 | 不公开 |
+| 凉宫春日 | ChatHaruhi 固定子集 | 1,009 / 115 | 第 1.5 轮复测 | 不公开 |
+
+数据来源、生成条件和许可边界见 [数据来源总表](data/README.md)。许澄和裴既明是
+可复现实例，不代表已经达到生产级安全或长度稳定性。
+
+完整结果、失败模式和检查点选择依据见
+[训练案例与失败模式](docs/FINETUNING_CASE_STUDY.md) 和
+[已发布 Adapter](weights/README.md)。
+
+### 端侧部署产物
+
+三个原创角色已合并到 Qwen3-1.7B，并以 MNN 3.5.0 Q8 格式发布：
+
+- [宋知意 MNN Q8](https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-song-zhiyi-mnn-q8)
+- [裴既明 MNN Q8](https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-pei-jiming-mnn-q8)
+- [许澄 MNN Q8](https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-xu-cheng-mnn-q8)
+
+这些模型包面向 Android/MNN Chat 的文字推理，包含权重、tokenizer、角色提示词、导出参数
+和文件哈希。Q8 是 MNN 权重量化格式，不是 GPTQ。
 
 ## 1. 先确认应该训练哪种 Qwen3
 
@@ -328,47 +375,7 @@ docs/                             复现、参数、参考、结果
 - 不同 CUDA/PyTorch/GPU 环境不承诺逐 bit 一致；
 - 所有发布 Adapter 都必须只用开发集选点，封存测试只运行一次。
 
-## 8. 项目内案例与验证
-
-下列内容是通用流程的应用记录，应放在复现文档之后阅读：
-
-- [数据来源总表](data/README.md)
-- [许澄数据](datasets/xu-cheng/README.md)
-- [宋知意数据](datasets/song-zhiyi/README.md)
-- [裴既明数据](datasets/pei-jiming/README.md)
-- [三个已发布 Adapter](weights/README.md)
-- [训练结果与失败模式](docs/FINETUNING_CASE_STUDY.md)
-- [Base/LoRA 同条件推理](docs/LOCAL_COMPARISON.md)
-- [全部 Base/LoRA 对话截图](screenshots/README.md)
-
-数据来源明确区分：
-
-| 角色 | 来源 | 数据与权重 |
-|---|---|---|
-| 许澄 | 原创 Character Bible；网页 GPT 系列，60 个会话记录 `GPT-6`、70 个早期会话 `unknown` | 数据和 Adapter 均已发布 |
-| 宋知意 | 原创角色卡；OpenCode `deepseek-v4.1-flash` 生成 | 数据和 Adapter 均已发布 |
-| 裴既明 | 原创角色圣经；OpenCode `deepseek-v4.1-flash` 生成 | 数据和 Adapter 均已发布 |
-| 孙悟空 | RoleBench 衍生数据 | 因第三方衍生边界不发布 |
-| 凉宫春日 | ChatHaruhi 固定子集 | 因上游许可声明冲突不发布 |
-
-### ModelScope MNN Q8 模型
-
-三个原创角色的 LoRA 已合并到 Qwen3-1.7B，并以 MNN 3.5.0 Q8 block64 发布到 ModelScope：
-
-| 角色 | 检查点 | MNN 模型 |
-|---|---|---|
-| 宋知意 | 1.5 轮 | <https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-song-zhiyi-mnn-q8> |
-| 许澄 | 第 1 轮 | <https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-xu-cheng-mnn-q8> |
-| 裴既明 | 第 1 轮 | <https://modelscope.cn/models/Alixs666/shiyu-qwen3-1.7b-pei-jiming-mnn-q8> |
-
-这些模型包面向 Android/MNN Chat 的本地文字推理，包含角色提示词、导出参数和文件哈希。
-Q8 是 MNN 权重量化格式，不是 GPTQ。许澄和裴既明是实验版，不代表生产级安全通过；
-端侧性能仍需在目标手机上复测。
-
-截图只是单次实际对话，不是统计证明。训练 loss、自动指标和单一 LLM 裁判都不能替代
-固定开发集、封存测试集和人工盲评。
-
-## 9. 验证仓库
+## 8. 验证仓库
 
 ```bash
 python scripts/check_environment.py --model models/qwen3-1.7b
