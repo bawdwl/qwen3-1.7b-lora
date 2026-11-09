@@ -26,12 +26,12 @@
 
 <table>
   <tr>
-    <td align="center"><img src="screenshots/song-zhiyi/base.png" width="440"><br><b>Qwen3-1.7B Base</b></td>
-    <td align="center"><img src="screenshots/song-zhiyi/lora.png" width="440"><br><b>宋知意 LoRA · 1.5 epochs</b></td>
+    <td align="center"><img src="screenshots/pei-jiming/base.png" width="440"><br><b>Qwen3-1.7B Base</b></td>
+    <td align="center"><img src="screenshots/pei-jiming/lora.png" width="440"><br><b>裴既明 LoRA · Epoch 1</b></td>
   </tr>
 </table>
 
-同一基座、同一角色提示词、相同生成参数下的 Base/LoRA 对照。更多结果见
+同一基座、同一角色提示词、相同生成参数下的裴既明 Base/LoRA 对照。更多结果见
 [全部对话截图](screenshots/README.md)；截图只代表单次实际对话，不等同于统计评测。
 
 ### 已完成的角色实验
