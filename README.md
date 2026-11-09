@@ -20,6 +20,12 @@
 [项目成果](#项目成果)。参考来源见
 [官方文档与高星项目对照](docs/REFERENCES.md)。
 
+## 方法总览
+
+<p align="center">
+  <img src="docs/images/lora-method-overview.png" alt="Qwen3-1.7B 角色 LoRA 从数据构建、SFT、微调、评测到 MNN 部署的全流程" width="100%">
+</p>
+
 ## 项目成果
 
 ### Base / LoRA 实际对话
